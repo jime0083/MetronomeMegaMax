@@ -1,0 +1,263 @@
+# MetronomeMegaMax 手動作業タスク管理
+
+## 凡例
+- [ ] 未着手
+- [~] 進行中
+- [x] 完了
+- [!] ブロック中（理由を記載）
+
+優先度: P0（必須・最優先）, P1（必須・高優先）, P2（必須・中優先）, P3（任意・低優先）
+
+---
+
+## 1. Firebase 設定 [P0]
+開発開始前に必須
+
+### 1.1 Firebase プロジェクト作成
+- [ ] Firebase Console でプロジェクト作成
+- [ ] プロジェクト名: metronome-mega-max
+- [ ] Google Analytics の有効化（任意）
+
+### 1.2 Firebase Authentication 設定
+- [ ] Authentication を有効化
+- [ ] Google Sign-In プロバイダーを有効化
+- [ ] 承認済みドメインの追加（本番ドメイン）
+
+### 1.3 Firebase Firestore 設定
+- [ ] Firestore Database を作成
+- [ ] 本番モードで開始
+- [ ] セキュリティルールの設定
+  ```
+  ルール例:
+  - users/{userId}: 本人のみ読み書き可能
+  - users/{userId}/presets/*: 本人のみ読み書き可能
+  - users/{userId}/loopPoints/*: 本人のみ読み書き可能
+  ```
+
+### 1.4 Firebase Storage 設定
+- [ ] Storage を有効化
+- [ ] セキュリティルールの設定
+  ```
+  ルール例:
+  - users/{userId}/*: 本人のみアップロード可能
+  - ファイルサイズ制限: 20MB
+  - 許可するMIMEタイプ: audio/mpeg, audio/wav
+  ```
+
+### 1.5 Firebase 設定ファイル取得
+- [ ] iOS 用 GoogleService-Info.plist のダウンロード
+- [ ] Web 用 Firebase Config の取得
+- [ ] 設定ファイルをプロジェクトに配置（.gitignore に追加）
+
+---
+
+## 2. Apple Developer / App Store Connect 設定 [P0]
+iOS リリースに必須
+
+### 2.1 Apple Developer Program
+- [ ] Apple Developer Program への登録（年間 $99）
+- [ ] 開発用証明書の作成
+- [ ] App ID の作成（Bundle ID: com.yourcompany.metronomemegamax）
+
+### 2.2 App Store Connect
+- [ ] App Store Connect で新規 App を作成
+- [ ] App 情報の入力
+  - App 名: MetronomeMegaMax
+  - プライマリ言語: 日本語
+  - カテゴリ: ミュージック
+  - サブカテゴリ: ユーティリティ
+
+### 2.3 In-App Purchase 設定
+- [ ] サブスクリプショングループの作成
+- [ ] 月額プラン（200円）の作成
+  - 製品ID: premium_monthly_200
+  - 価格: ¥200
+  - 期間: 1ヶ月
+- [ ] サンドボックステスターの追加
+
+### 2.4 プロビジョニングプロファイル
+- [ ] 開発用プロビジョニングプロファイルの作成
+- [ ] 配布用プロビジョニングプロファイルの作成
+
+---
+
+## 3. Stripe 設定 [P1]
+Web版の課金に必須
+
+### 3.1 Stripe アカウント
+- [ ] Stripe アカウントの作成
+- [ ] 本番モードの有効化（本人確認等）
+- [ ] APIキーの取得（テスト用 / 本番用）
+
+### 3.2 Stripe 商品設定
+- [ ] 商品の作成: MetronomeMegaMax Premium
+- [ ] 価格の作成: ¥200/月（recurring）
+- [ ] 価格ID の記録
+
+### 3.3 Stripe Webhook 設定
+- [ ] Webhook エンドポイントの設定
+- [ ] 以下のイベントを購読:
+  - customer.subscription.created
+  - customer.subscription.updated
+  - customer.subscription.deleted
+  - invoice.payment_succeeded
+  - invoice.payment_failed
+- [ ] Webhook Secret の取得
+
+### 3.4 Stripe Customer Portal
+- [ ] Customer Portal の有効化
+- [ ] ブランディング設定（ロゴ、色）
+- [ ] 解約フローの設定
+
+---
+
+## 4. Google Cloud Platform 設定 [P1]
+Google Sign-In に必須
+
+### 4.1 OAuth 同意画面
+- [ ] OAuth 同意画面の設定
+- [ ] アプリ名、サポートメール、ロゴの設定
+- [ ] スコープの設定（email, profile）
+
+### 4.2 OAuth クライアント ID
+- [ ] iOS 用 OAuth クライアント ID の作成
+- [ ] Web 用 OAuth クライアント ID の作成
+- [ ] クライアント ID / シークレットの記録
+
+---
+
+## 5. 広告設定 [P2]
+収益化に必要
+
+### 5.1 Google AdMob（iOS）
+- [ ] AdMob アカウントの作成
+- [ ] iOS アプリの登録
+- [ ] バナー広告ユニットの作成
+- [ ] 広告ユニット ID の記録
+- [ ] app-ads.txt の設定
+
+### 5.2 Google AdSense（Web）
+- [ ] AdSense アカウントの作成（または既存を使用）
+- [ ] サイトの追加・審査
+- [ ] 広告ユニットの作成
+  - サイドバー用: 160x600
+  - 下部バナー用: 728x90
+  - モバイル用: 320x50
+- [ ] 広告コードの取得
+
+---
+
+## 6. ドメイン・ホスティング設定 [P2]
+Web版リリースに必要
+
+### 6.1 ドメイン取得
+- [ ] ドメインの取得（例: metronomemegamax.com）
+- [ ] DNS 設定
+
+### 6.2 ホスティング設定
+- [ ] Firebase Hosting または Vercel の設定
+- [ ] カスタムドメインの接続
+- [ ] SSL 証明書の設定（自動）
+
+---
+
+## 7. 法務・コンプライアンス [P1]
+リリース前に必須
+
+### 7.1 プライバシーポリシー
+- [ ] プライバシーポリシーの作成
+  - 収集するデータ: メールアドレス、課金情報
+  - 使用目的: 認証、課金管理、サービス提供
+  - 第三者提供: Firebase, Stripe
+- [ ] Webページとして公開
+- [ ] App Store Connect への URL 登録
+
+### 7.2 利用規約
+- [ ] 利用規約の作成
+  - サービス内容
+  - 禁止事項（著作権侵害ファイルのアップロード等）
+  - 免責事項
+  - 課金・解約について
+- [ ] Webページとして公開
+
+### 7.3 特定商取引法に基づく表記（日本向け）
+- [ ] 販売事業者名
+- [ ] 所在地
+- [ ] 連絡先
+- [ ] 販売価格
+- [ ] 支払方法
+- [ ] 返品・キャンセルについて
+
+---
+
+## 8. テスト環境 [P2]
+
+### 8.1 テストアカウント
+- [ ] Firebase Authentication テストユーザーの作成
+- [ ] App Store Connect サンドボックステスターの追加
+- [ ] Stripe テストカード情報の確認
+
+### 8.2 テスト環境の分離
+- [ ] Firebase プロジェクト（開発用 / 本番用）の分離検討
+- [ ] 環境変数による切り替え設定
+
+---
+
+## 9. アセット準備 [P2]
+
+### 9.1 音声ファイル
+- [ ] メトロノームクリック音の準備（通常音）
+- [ ] メトロノームクリック音の準備（アクセント音）
+- [ ] タイマー終了アラーム音の準備
+- [ ] 著作権フリーであることの確認
+
+### 9.2 アプリアイコン
+- [ ] iOS アプリアイコンの作成（1024x1024）
+- [ ] 各サイズへのリサイズ
+- [ ] Web ファビコンの作成
+
+### 9.3 スプラッシュスクリーン
+- [ ] iOS スプラッシュスクリーンの作成
+
+### 9.4 App Store 素材
+- [ ] スクリーンショットの作成（各デバイスサイズ）
+- [ ] プレビュー動画の作成（任意）
+- [ ] App 説明文の作成（日本語/英語/スペイン語）
+
+---
+
+## 10. リリース後 [P3]
+
+### 10.1 モニタリング設定
+- [ ] Firebase Crashlytics の設定
+- [ ] Firebase Analytics の設定
+- [ ] Google Search Console の設定
+
+### 10.2 サポート体制
+- [ ] サポートメールアドレスの設定
+- [ ] お問い合わせフォームの作成（任意）
+
+---
+
+## 現在のステータス
+
+**最終更新:** 2026-02-22
+**次のアクション:** Firebase プロジェクト作成（1.1）
+
+---
+
+## 作業順序の推奨
+
+1. **Phase 0 開始前:** 1.1〜1.5（Firebase設定）、4.1〜4.2（OAuth設定）
+2. **Phase 5 開始前:** 2.1〜2.4（Apple Developer設定）、3.1〜3.4（Stripe設定）
+3. **Phase 7 開始前:** 5.1〜5.2（広告設定）
+4. **Phase 10 開始前:** 6.1〜6.2（ホスティング設定）、7.1〜7.3（法務）、9.1〜9.4（アセット）
+
+---
+
+## メモ・注意事項
+
+- APIキーやシークレットは絶対にGitにコミットしない
+- 本番環境と開発環境は分離を推奨
+- Apple Developer Program の審査には時間がかかる場合があるため、早めに登録
+- AdSense は審査に時間がかかるため、サイト公開後すぐに申請
