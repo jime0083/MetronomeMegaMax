@@ -1,0 +1,47 @@
+# MetronomeMegaMax 完了タスクアーカイブ
+
+このファイルには、progress.txt および manual-work.txt から完了したタスクを移動して記録します。
+
+---
+
+## 完了タスク一覧
+
+### 2026-02-24 完了
+
+#### manual-work.txt より
+
+**1. Firebase 設定**
+
+1.1 Firebase プロジェクト作成
+- [x] Firebase Console でプロジェクト作成
+- [x] プロジェクト名: metronome-mega-max
+- [x] Google Analytics の有効化（任意）
+
+1.2 Firebase Authentication 設定
+- [x] Authentication を有効化
+- [x] Google Sign-In プロバイダーを有効化
+- [ ] 承認済みドメインの追加（本番ドメイン） → **本番リリース時に実施**
+
+1.3 Firebase Firestore 設定
+- [x] Firestore Database を作成
+- [x] 本番モードで開始
+- [x] セキュリティルールの設定（ユーザーごとのアクセス制御）
+
+1.4 Firebase Storage 設定
+- [x] Storage を有効化
+- [x] セキュリティルールの設定（20MB制限、音声ファイルのみ許可）
+
+1.5 Firebase 設定ファイル取得
+- [x] iOS 用 GoogleService-Info.plist のダウンロード
+- [x] Web 用 Firebase Config の取得
+- [x] 設定ファイルをプロジェクトに配置（ios/config/）
+- [x] .gitignore に追加
+
+---
+
+## アーカイブ履歴
+
+| 日付 | 移動元 | タスク概要 |
+|------|--------|-----------|
+| 2026-02-24 | manual-work.txt | Firebase プロジェクト作成、Authentication設定 |
+| 2026-02-24 | manual-work.txt | Firebase Firestore/Storage設定、設定ファイル取得 |
