@@ -11,3 +11,12 @@ export { TimerPanel } from './timer/TimerPanel';
 
 // Audio components
 export { AudioPlayerPanel } from './audio/AudioPlayerPanel';
+
+// Auth components
+export { LoginModal, UserMenu } from './auth';
+
+// Subscription components
+export { SubscriptionModal } from './subscription';
+
+// Ads components
+export { AdBanner } from './ads';

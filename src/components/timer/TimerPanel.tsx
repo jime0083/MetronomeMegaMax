@@ -7,8 +7,9 @@ import {
   Platform,
 } from 'react-native';
 import { Panel } from '@/components/layout/Panel';
-import { colors, typography, spacing, borderRadius, shadows } from '@/constants/theme';
-import { TIMER_INCREMENT_OPTIONS, MAX_TIMER_SECONDS } from '@/constants';
+import { DropdownSelector } from '@/components/common/DropdownSelector';
+import { colors, typography, spacing, borderRadius } from '@/constants/theme';
+import { TIMER_INCREMENT_OPTIONS, MAX_TIMER_SECONDS, TIMER_PRESET_OPTIONS } from '@/constants';
 
 interface TimerPanelProps {
   remainingSeconds: number;
@@ -16,6 +17,7 @@ interface TimerPanelProps {
   isRunning: boolean;
   isPaused: boolean;
   onAddTime: (seconds: number) => void;
+  onSetTime: (seconds: number) => void;
   onStart: () => void;
   onPause: () => void;
   onResume: () => void;
@@ -30,6 +32,7 @@ export const TimerPanel: React.FC<TimerPanelProps> = ({
   isRunning,
   isPaused,
   onAddTime,
+  onSetTime,
   onStart,
   onPause,
   onResume,
@@ -54,12 +57,6 @@ export const TimerPanel: React.FC<TimerPanelProps> = ({
     () => formatTime(remainingSeconds),
     [remainingSeconds, formatTime]
   );
-
-  // Progress percentage
-  const progressPercent = useMemo(() => {
-    if (totalSeconds === 0) return 0;
-    return ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
-  }, [totalSeconds, remainingSeconds]);
 
   // Format increment button labels
   const formatIncrement = (seconds: number): string => {
@@ -94,56 +91,74 @@ export const TimerPanel: React.FC<TimerPanelProps> = ({
 
   const isAlmostDone = remainingSeconds <= 10 && remainingSeconds > 0 && isRunning;
 
+  // Format preset options for dropdown display
+  const presetDropdownOptions = useMemo(() =>
+    TIMER_PRESET_OPTIONS.map(opt => ({
+      value: opt.value,
+      label: opt.label,
+    })),
+    []
+  );
+
+  // Find current preset value (or 0 for custom)
+  const currentPresetValue = useMemo(() => {
+    const matchingPreset = TIMER_PRESET_OPTIONS.find(opt => opt.value === totalSeconds);
+    return matchingPreset ? matchingPreset.value : 0;
+  }, [totalSeconds]);
+
+  const handlePresetSelect = useCallback((value: number) => {
+    if (value > 0) {
+      onSetTime(value);
+    }
+  }, [onSetTime]);
+
   return (
     <Panel title="TIMER">
-      {/* Circular Progress Ring */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressRing}>
-          {/* Background ring */}
-          <View style={styles.ringBackground} />
-
-          {/* Progress arc - simplified visual representation */}
-          <View
-            style={[
-              styles.progressArc,
-              {
-                opacity: progressPercent > 0 ? 1 : 0.3,
-              },
-            ]}
-          />
-
-          {/* Time Display */}
-          <View style={styles.timeDisplayContainer}>
-            <View style={styles.timeRow}>
-              <Text style={[styles.timeDigit, isAlmostDone && styles.timeDigitWarning]}>
-                {timeDisplay.hours}
-              </Text>
-              <Text style={[styles.timeSeparator, isAlmostDone && styles.timeDigitWarning]}>:</Text>
-              <Text style={[styles.timeDigit, isAlmostDone && styles.timeDigitWarning]}>
-                {timeDisplay.minutes}
-              </Text>
-              <Text style={[styles.timeSeparator, isAlmostDone && styles.timeDigitWarning]}>:</Text>
-              <Text style={[styles.timeDigit, isAlmostDone && styles.timeDigitWarning]}>
-                {timeDisplay.seconds}
-              </Text>
-            </View>
-            <View style={styles.timeLabels}>
-              <Text style={styles.timeLabel}>HRS</Text>
-              <Text style={styles.timeLabel}>MIN</Text>
-              <Text style={styles.timeLabel}>SEC</Text>
-            </View>
+      {/* Time Display */}
+      <View style={styles.timeDisplayContainer}>
+        <View style={styles.timeRow}>
+          <View style={styles.timeDigitContainer}>
+            <Text style={[styles.timeDigit, isAlmostDone && styles.timeDigitWarning]}>
+              {timeDisplay.hours}
+            </Text>
+            <Text style={styles.timeLabel}>HRS</Text>
+          </View>
+          <Text style={[styles.timeSeparator, isAlmostDone && styles.timeDigitWarning]}>:</Text>
+          <View style={styles.timeDigitContainer}>
+            <Text style={[styles.timeDigit, isAlmostDone && styles.timeDigitWarning]}>
+              {timeDisplay.minutes}
+            </Text>
+            <Text style={styles.timeLabel}>MIN</Text>
+          </View>
+          <Text style={[styles.timeSeparator, isAlmostDone && styles.timeDigitWarning]}>:</Text>
+          <View style={styles.timeDigitContainer}>
+            <Text style={[styles.timeDigit, isAlmostDone && styles.timeDigitWarning]}>
+              {timeDisplay.seconds}
+            </Text>
+            <Text style={styles.timeLabel}>SEC</Text>
           </View>
         </View>
       </View>
 
+      {/* Preset Selector */}
+      {!isRunning && !isPaused && (
+        <View style={styles.presetSelectorContainer}>
+          <DropdownSelector
+            label="時間を選択"
+            value={currentPresetValue}
+            options={presetDropdownOptions}
+            onChange={handlePresetSelect}
+          />
+        </View>
+      )}
+
       {/* Increment Buttons */}
       <View style={styles.incrementsContainer}>
-        <Text style={styles.incrementsLabel}>ADD TIME</Text>
         <View style={styles.incrementsRow}>
           {TIMER_INCREMENT_OPTIONS.map((seconds) => (
             <TouchableOpacity
               key={seconds}
-              style={styles.incrementButton}
+              style={[styles.incrementButton, isRunning && styles.incrementButtonDisabled]}
               onPress={() => handleAddTime(seconds)}
               disabled={isRunning}
               accessibilityLabel={`Add ${formatIncrement(seconds)}`}
@@ -175,12 +190,6 @@ export const TimerPanel: React.FC<TimerPanelProps> = ({
             {getMainButtonLabel()}
           </Text>
         </TouchableOpacity>
-
-        {(isRunning || isPaused || remainingSeconds !== totalSeconds) && (
-          <TouchableOpacity style={styles.resetButton} onPress={onReset}>
-            <Text style={styles.resetButtonText}>RESET</Text>
-          </TouchableOpacity>
-        )}
       </View>
 
       {/* Save Preset Button (Premium) */}
@@ -194,93 +203,55 @@ export const TimerPanel: React.FC<TimerPanelProps> = ({
 };
 
 const styles = StyleSheet.create({
-  // Progress Ring
-  progressContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing[6],
-  },
-  progressRing: {
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  ringBackground: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    borderRadius: 110,
-    borderWidth: 6,
-    borderColor: colors.surface.darkElevated,
-  },
-  progressArc: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    borderRadius: 110,
-    borderWidth: 6,
-    borderColor: colors.accent[500],
-    borderLeftColor: 'transparent',
-    borderBottomColor: 'transparent',
-    transform: [{ rotate: '-45deg' }],
-  },
-
   // Time Display
   timeDisplayContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing[6],
+    marginTop: spacing[4],
   },
   timeRow: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  timeDigitContainer: {
     alignItems: 'center',
   },
   timeDigit: {
-    color: colors.text.dark.primary,
+    color: colors.text.primary,
     fontSize: typography.fontSize['5xl'],
-    fontWeight: typography.fontWeight.black,
+    fontWeight: typography.fontWeight.bold,
     fontFamily: typography.fontFamily.mono,
-    minWidth: 60,
+    minWidth: 70,
     textAlign: 'center',
   },
   timeDigitWarning: {
     color: colors.warning,
-    textShadowColor: colors.warning,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 15,
   },
   timeSeparator: {
-    color: colors.text.dark.secondary,
+    color: colors.text.secondary,
     fontSize: typography.fontSize['4xl'],
     fontWeight: typography.fontWeight.normal,
     marginHorizontal: spacing[1],
-  },
-  timeLabels: {
-    flexDirection: 'row',
-    marginTop: spacing[2],
-    gap: spacing[8],
+    marginTop: spacing[1],
   },
   timeLabel: {
-    color: colors.text.dark.tertiary,
+    color: colors.text.tertiary,
     fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.bold,
-    letterSpacing: 2,
-    width: 40,
-    textAlign: 'center',
+    fontWeight: typography.fontWeight.medium,
+    marginTop: spacing[1],
+  },
+
+  // Preset Selector
+  presetSelectorContainer: {
+    alignItems: 'center',
+    marginBottom: spacing[4],
   },
 
   // Increment Buttons
   incrementsContainer: {
     alignItems: 'center',
     marginBottom: spacing[6],
-  },
-  incrementsLabel: {
-    color: colors.text.dark.tertiary,
-    fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.bold,
-    letterSpacing: 2,
-    marginBottom: spacing[3],
   },
   incrementsRow: {
     flexDirection: 'row',
@@ -292,10 +263,10 @@ const styles = StyleSheet.create({
   incrementButton: {
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[2],
-    backgroundColor: colors.surface.darkElevated,
+    backgroundColor: colors.surface.primary,
     borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.text.dark.tertiary,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
     minWidth: 56,
     alignItems: 'center',
     ...(Platform.OS === 'web' && {
@@ -303,14 +274,17 @@ const styles = StyleSheet.create({
       transition: 'all 0.15s ease',
     }),
   },
+  incrementButtonDisabled: {
+    borderColor: colors.border.light,
+  },
   incrementButtonText: {
-    color: colors.text.dark.primary,
+    color: colors.text.primary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.semibold,
     fontFamily: typography.fontFamily.mono,
   },
   incrementButtonTextDisabled: {
-    color: colors.text.dark.disabled,
+    color: colors.text.disabled,
   },
 
   // Control Buttons
@@ -323,41 +297,26 @@ const styles = StyleSheet.create({
   },
   mainButton: {
     paddingHorizontal: spacing[10],
-    paddingVertical: spacing[4],
-    backgroundColor: colors.accent[500],
-    borderRadius: borderRadius.xl,
+    paddingVertical: spacing[3],
+    backgroundColor: colors.surface.primary,
+    borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.lg,
-    shadowColor: colors.accent[500],
+    borderWidth: 2,
+    borderColor: colors.border.primary,
   },
   mainButtonSecondary: {
-    backgroundColor: colors.surface.darkElevated,
-    borderWidth: 2,
-    borderColor: colors.accent[500],
-    shadowColor: '#000',
+    backgroundColor: colors.accent[500],
+    borderColor: colors.accent[600],
   },
   mainButtonText: {
-    color: colors.background.dark,
+    color: colors.text.primary,
     fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.black,
-    letterSpacing: 4,
-  },
-  mainButtonTextSecondary: {
-    color: colors.accent[500],
-  },
-  resetButton: {
-    paddingHorizontal: spacing[5],
-    paddingVertical: spacing[3],
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.text.dark.tertiary,
-  },
-  resetButtonText: {
-    color: colors.text.dark.secondary,
-    fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
     letterSpacing: 2,
+  },
+  mainButtonTextSecondary: {
+    color: colors.surface.primary,
   },
 
   // Save Button
@@ -365,11 +324,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[6],
     paddingVertical: spacing[2],
     borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.text.dark.tertiary,
+    borderWidth: 2,
+    borderColor: colors.border.secondary,
   },
   saveButtonText: {
-    color: colors.text.dark.secondary,
+    color: colors.text.secondary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
     letterSpacing: 2,

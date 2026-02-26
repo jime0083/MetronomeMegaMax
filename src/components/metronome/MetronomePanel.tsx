@@ -9,9 +9,31 @@ import {
   Platform,
 } from 'react-native';
 import { Panel } from '@/components/layout/Panel';
-import { colors, typography, spacing, borderRadius, shadows } from '@/constants/theme';
+import { DropdownSelector } from '@/components/common/DropdownSelector';
+import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 import type { TimeSignature, AccentPattern } from '@/types';
-import { MIN_BPM, MAX_BPM, TIME_SIGNATURES } from '@/constants';
+import { MIN_BPM, MAX_BPM } from '@/constants';
+
+// Time signature options
+const TIME_SIGNATURE_OPTIONS: { value: TimeSignature; label: string }[] = [
+  { value: '2/4', label: '2/4' },
+  { value: '3/4', label: '3/4' },
+  { value: '4/4', label: '4/4' },
+  { value: '5/4', label: '5/4' },
+  { value: '6/4', label: '6/4' },
+  { value: '7/4', label: '7/4' },
+  { value: '3/8', label: '3/8' },
+  { value: '6/8', label: '6/8' },
+  { value: '9/8', label: '9/8' },
+  { value: '12/8', label: '12/8' },
+];
+
+// Accent pattern options
+const ACCENT_PATTERN_OPTIONS: { value: AccentPattern; label: string }[] = [
+  { value: 'first', label: '1拍目' },
+  { value: 'first-third', label: '1・3拍目' },
+  { value: 'second-fourth', label: '2・4拍目' },
+];
 
 interface MetronomePanelProps {
   bpm: number;
@@ -27,6 +49,20 @@ interface MetronomePanelProps {
   isPremium?: boolean;
 }
 
+// Get tempo name from BPM
+const getTempoName = (bpm: number): string => {
+  if (bpm < 40) return 'Grave';
+  if (bpm < 60) return 'Largo';
+  if (bpm < 66) return 'Larghetto';
+  if (bpm < 76) return 'Adagio';
+  if (bpm < 108) return 'Andante';
+  if (bpm < 120) return 'Moderato';
+  if (bpm < 156) return 'Allegro';
+  if (bpm < 176) return 'Vivace';
+  if (bpm < 200) return 'Presto';
+  return 'Prestissimo';
+};
+
 export const MetronomePanel: React.FC<MetronomePanelProps> = ({
   bpm,
   timeSignature,
@@ -41,12 +77,11 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
   isPremium = false,
 }) => {
   const pendulumAnim = useRef(new Animated.Value(0)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
 
   // Parse time signature to get beats per measure
   const beatsPerMeasure = parseInt(timeSignature.split('/')[0], 10);
 
-  // Pendulum animation
+  // Vertical pendulum animation - swings left and right
   useEffect(() => {
     if (isPlaying) {
       const duration = (60 / bpm) * 1000; // One beat duration in ms
@@ -61,7 +96,7 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
           }),
           Animated.timing(pendulumAnim, {
             toValue: -1,
-            duration: duration / 2,
+            duration: duration,
             easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
@@ -85,28 +120,6 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
     }
   }, [isPlaying, bpm, pendulumAnim]);
 
-  // Glow pulse animation when playing
-  useEffect(() => {
-    if (isPlaying) {
-      const animation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(glowAnim, {
-            toValue: 1,
-            duration: 100,
-            useNativeDriver: true,
-          }),
-          Animated.timing(glowAnim, {
-            toValue: 0.3,
-            duration: (60 / bpm) * 1000 - 100,
-            useNativeDriver: true,
-          }),
-        ])
-      );
-      animation.start();
-      return () => animation.stop();
-    }
-  }, [isPlaying, bpm, glowAnim]);
-
   const handleBpmIncrement = useCallback(() => {
     if (bpm < MAX_BPM) onBpmChange(bpm + 1);
   }, [bpm, onBpmChange]);
@@ -115,9 +128,10 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
     if (bpm > MIN_BPM) onBpmChange(bpm - 1);
   }, [bpm, onBpmChange]);
 
+  // Pendulum rotation (swinging from top pivot point)
   const pendulumRotation = pendulumAnim.interpolate({
     inputRange: [-1, 0, 1],
-    outputRange: ['-30deg', '0deg', '30deg'],
+    outputRange: ['-25deg', '0deg', '25deg'],
   });
 
   const isAccentBeat = (beat: number): boolean => {
@@ -129,44 +143,28 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
 
   return (
     <Panel title="METRONOME">
-      {/* Pendulum Container */}
+      {/* Tempo Name */}
+      <Text style={styles.tempoName}>{getTempoName(bpm)}</Text>
+
+      {/* Vertical Pendulum Container */}
       <View style={styles.pendulumContainer}>
-        <View style={styles.pendulumPivot}>
-          <View style={styles.pivotDot} />
-        </View>
+        {/* Pendulum arm with pivot at top */}
         <Animated.View
           style={[
             styles.pendulumArm,
             {
-              transform: [
-                { rotate: pendulumRotation },
-              ],
+              transform: [{ rotate: pendulumRotation }],
             },
           ]}
         >
+          {/* Pendulum rod (orange) */}
           <View style={styles.pendulumRod} />
-          <Animated.View
-            style={[
-              styles.pendulumWeight,
-              isPlaying && {
-                shadowOpacity: glowAnim,
-              },
-            ]}
-          />
+          {/* Pendulum weight (white circle) */}
+          <View style={styles.pendulumWeight} />
         </Animated.View>
 
-        {/* Scale marks */}
-        <View style={styles.scaleContainer}>
-          {[-3, -2, -1, 0, 1, 2, 3].map((mark) => (
-            <View
-              key={mark}
-              style={[
-                styles.scaleMark,
-                mark === 0 && styles.scaleMarkCenter,
-              ]}
-            />
-          ))}
-        </View>
+        {/* Pivot point at top */}
+        <View style={styles.pendulumPivot} />
       </View>
 
       {/* BPM Display */}
@@ -198,7 +196,7 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
       {/* Beat Indicators */}
       <View style={styles.beatIndicators}>
         {Array.from({ length: beatsPerMeasure }).map((_, index) => (
-          <Animated.View
+          <View
             key={index}
             style={[
               styles.beatDot,
@@ -212,24 +210,26 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
 
       {/* Selectors Row */}
       <View style={styles.selectorsRow}>
-        <View style={styles.selectorContainer}>
-          <Text style={styles.selectorLabel}>TIME</Text>
-          <TouchableOpacity style={styles.selector}>
-            <Text style={styles.selectorValue}>{timeSignature}</Text>
-            <Text style={styles.selectorChevron}>▾</Text>
-          </TouchableOpacity>
-        </View>
+        <DropdownSelector
+          label="TIME"
+          value={timeSignature}
+          options={TIME_SIGNATURE_OPTIONS}
+          onChange={onTimeSignatureChange}
+        />
 
-        <View style={styles.selectorContainer}>
-          <Text style={styles.selectorLabel}>ACCENT</Text>
-          <TouchableOpacity style={styles.selector}>
-            <Text style={styles.selectorValue}>
-              {accentPattern === 'first' ? '1' :
-               accentPattern === 'first-third' ? '1・3' : '2・4'}
-            </Text>
-            <Text style={styles.selectorChevron}>▾</Text>
-          </TouchableOpacity>
-        </View>
+        <DropdownSelector
+          label="ACCENT"
+          value={accentPattern}
+          options={ACCENT_PATTERN_OPTIONS}
+          onChange={onAccentPatternChange}
+          displayValue={
+            accentPattern === 'first'
+              ? '1'
+              : accentPattern === 'first-third'
+                ? '1・3'
+                : '2・4'
+          }
+        />
       </View>
 
       {/* Start/Stop Button */}
@@ -254,9 +254,18 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
 };
 
 const styles = StyleSheet.create({
+  // Tempo Name
+  tempoName: {
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.medium,
+    marginBottom: spacing[2],
+    letterSpacing: 1,
+  },
+
   // Pendulum
   pendulumContainer: {
-    height: 180,
+    height: 160,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -264,55 +273,34 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   pendulumPivot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: colors.surface.darkElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.border.primary,
     zIndex: 10,
-  },
-  pivotDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.accent[500],
   },
   pendulumArm: {
     position: 'absolute',
-    top: 10,
+    top: 6,
     alignItems: 'center',
     transformOrigin: 'top center',
   },
   pendulumRod: {
-    width: 3,
-    height: 120,
-    backgroundColor: colors.text.dark.tertiary,
-    borderRadius: 1.5,
+    width: 6,
+    height: 110,
+    backgroundColor: colors.accent[500],
+    borderRadius: 3,
   },
   pendulumWeight: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.accent[500],
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.surface.primary,
     marginTop: -4,
-    ...shadows.glow,
-  },
-  scaleContainer: {
-    position: 'absolute',
-    bottom: 20,
-    flexDirection: 'row',
-    gap: spacing[4],
-  },
-  scaleMark: {
-    width: 2,
-    height: 8,
-    backgroundColor: colors.text.dark.tertiary,
-    borderRadius: 1,
-  },
-  scaleMarkCenter: {
-    height: 14,
-    backgroundColor: colors.accent[500],
+    borderWidth: 3,
+    borderColor: colors.border.primary,
   },
 
   // BPM Controls
@@ -320,49 +308,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing[4],
-    marginBottom: spacing[6],
+    gap: spacing[6],
+    marginBottom: spacing[4],
   },
   bpmButton: {
-    width: 56,
-    height: 56,
+    width: 48,
+    height: 48,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.surface.darkElevated,
+    backgroundColor: colors.surface.primary,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: colors.text.dark.tertiary,
+    borderColor: colors.border.primary,
     ...(Platform.OS === 'web' && {
       cursor: 'pointer',
       transition: 'all 0.15s ease',
     }),
   },
   bpmButtonText: {
-    color: colors.text.dark.primary,
-    fontSize: typography.fontSize['3xl'],
+    color: colors.text.primary,
+    fontSize: typography.fontSize['2xl'],
     fontWeight: typography.fontWeight.medium,
     marginTop: -2,
   },
   bpmDisplay: {
     alignItems: 'center',
-    minWidth: 140,
+    minWidth: 100,
   },
   bpmValue: {
-    color: colors.accent[500],
-    fontSize: typography.fontSize['7xl'],
-    fontWeight: typography.fontWeight.black,
+    color: colors.text.primary,
+    fontSize: typography.fontSize['5xl'],
+    fontWeight: typography.fontWeight.bold,
     fontFamily: typography.fontFamily.mono,
-    letterSpacing: -2,
-    lineHeight: typography.fontSize['7xl'] * 1.1,
-    textShadowColor: colors.accent[500],
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
+    letterSpacing: -1,
+    lineHeight: typography.fontSize['5xl'] * 1.1,
   },
   bpmLabel: {
-    color: colors.text.dark.secondary,
+    color: colors.text.secondary,
     fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.bold,
-    letterSpacing: 4,
+    fontWeight: typography.fontWeight.medium,
     marginTop: spacing[1],
   },
 
@@ -371,7 +355,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: spacing[3],
-    marginBottom: spacing[6],
+    marginBottom: spacing[4],
   },
   beatDot: {
     width: 16,
@@ -379,23 +363,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: colors.beat.inactive,
     borderWidth: 2,
-    borderColor: colors.surface.darkElevated,
+    borderColor: colors.border.secondary,
   },
   beatDotActive: {
     backgroundColor: colors.beat.active,
-    shadowColor: colors.beat.active,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 5,
+    borderColor: colors.accent[600],
   },
   beatDotAccent: {
-    borderColor: colors.beat.accent,
+    borderColor: colors.accent[500],
     borderWidth: 2,
   },
   beatDotAccentActive: {
     backgroundColor: colors.beat.accent,
-    shadowColor: colors.beat.accent,
+    borderColor: colors.beat.accent,
   },
 
   // Selectors
@@ -403,67 +383,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: spacing[4],
-    marginBottom: spacing[6],
-  },
-  selectorContainer: {
-    alignItems: 'center',
-  },
-  selectorLabel: {
-    color: colors.text.dark.tertiary,
-    fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.bold,
-    letterSpacing: 2,
-    marginBottom: spacing[2],
-  },
-  selector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[2],
-    backgroundColor: colors.surface.darkElevated,
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.text.dark.tertiary,
-    minWidth: 100,
-    justifyContent: 'center',
-  },
-  selectorValue: {
-    color: colors.text.dark.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.semibold,
-    fontFamily: typography.fontFamily.mono,
-  },
-  selectorChevron: {
-    color: colors.text.dark.tertiary,
-    fontSize: typography.fontSize.xs,
-    marginLeft: spacing[2],
+    marginBottom: spacing[4],
   },
 
   // Play Button
   playButton: {
-    paddingHorizontal: spacing[12],
-    paddingVertical: spacing[4],
-    backgroundColor: colors.accent[500],
-    borderRadius: borderRadius.xl,
+    paddingHorizontal: spacing[10],
+    paddingVertical: spacing[3],
+    backgroundColor: colors.surface.primary,
+    borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.lg,
-    shadowColor: colors.accent[500],
+    borderWidth: 2,
+    borderColor: colors.border.primary,
     marginBottom: spacing[3],
   },
   playButtonActive: {
-    backgroundColor: colors.surface.darkElevated,
-    borderWidth: 2,
-    borderColor: colors.accent[500],
+    backgroundColor: colors.accent[500],
+    borderColor: colors.accent[600],
   },
   playButtonText: {
-    color: colors.background.dark,
+    color: colors.text.primary,
     fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.black,
-    letterSpacing: 4,
+    fontWeight: typography.fontWeight.bold,
+    letterSpacing: 2,
   },
   playButtonTextActive: {
-    color: colors.accent[500],
+    color: colors.surface.primary,
   },
 
   // Save Button
@@ -471,11 +417,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[6],
     paddingVertical: spacing[2],
     borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.text.dark.tertiary,
+    borderWidth: 2,
+    borderColor: colors.border.secondary,
   },
   saveButtonText: {
-    color: colors.text.dark.secondary,
+    color: colors.text.secondary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
     letterSpacing: 2,

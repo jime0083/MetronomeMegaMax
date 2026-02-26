@@ -11,23 +11,13 @@ interface PanelProps {
 export const Panel: React.FC<PanelProps> = ({ title, children, style }) => {
   return (
     <View style={[styles.panel, style]}>
-      {/* Decorative corner accents */}
-      <View style={[styles.cornerAccent, styles.cornerTopLeft]} />
-      <View style={[styles.cornerAccent, styles.cornerTopRight]} />
-      <View style={[styles.cornerAccent, styles.cornerBottomLeft]} />
-      <View style={[styles.cornerAccent, styles.cornerBottomRight]} />
-
-      {/* Title bar with subtle gradient effect */}
+      {/* Title bar */}
       <View style={styles.titleBar}>
-        <View style={styles.titleIndicator} />
         <Text style={styles.title}>{title}</Text>
       </View>
 
       {/* Content area */}
       <View style={styles.content}>{children}</View>
-
-      {/* Bottom decorative line */}
-      <View style={styles.bottomLine} />
     </View>
   );
 };
@@ -35,89 +25,35 @@ export const Panel: React.FC<PanelProps> = ({ title, children, style }) => {
 const styles = StyleSheet.create({
   panel: {
     flex: 1,
-    backgroundColor: colors.surface.dark,
-    borderRadius: borderRadius.xl,
-    borderWidth: 1,
-    borderColor: colors.surface.darkElevated,
+    backgroundColor: colors.surface.primary,
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
     overflow: 'hidden',
     position: 'relative',
     minHeight: 400,
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(10px)',
-    }),
-    ...shadows.md,
-  },
-
-  // Corner accents for that premium instrument feel
-  cornerAccent: {
-    position: 'absolute',
-    width: 12,
-    height: 12,
-    borderColor: colors.accent[600],
-  },
-  cornerTopLeft: {
-    top: 8,
-    left: 8,
-    borderTopWidth: 2,
-    borderLeftWidth: 2,
-  },
-  cornerTopRight: {
-    top: 8,
-    right: 8,
-    borderTopWidth: 2,
-    borderRightWidth: 2,
-  },
-  cornerBottomLeft: {
-    bottom: 8,
-    left: 8,
-    borderBottomWidth: 2,
-    borderLeftWidth: 2,
-  },
-  cornerBottomRight: {
-    bottom: 8,
-    right: 8,
-    borderBottomWidth: 2,
-    borderRightWidth: 2,
+    ...shadows.sm,
   },
 
   titleBar: {
-    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing[6],
-    paddingVertical: spacing[4],
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 190, 37, 0.1)',
-  },
-  titleIndicator: {
-    width: 4,
-    height: 16,
-    backgroundColor: colors.accent[500],
-    borderRadius: 2,
-    marginRight: spacing[3],
+    paddingVertical: spacing[3],
+    borderBottomWidth: 2,
+    borderBottomColor: colors.border.primary,
+    backgroundColor: colors.surface.primary,
   },
   title: {
-    color: colors.text.dark.primary,
-    fontSize: typography.fontSize.sm,
+    color: colors.text.primary,
+    fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
-    letterSpacing: 2,
+    letterSpacing: 1,
     textTransform: 'uppercase',
   },
 
   content: {
     flex: 1,
-    padding: spacing[6],
+    padding: spacing[4],
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  bottomLine: {
-    position: 'absolute',
-    bottom: 0,
-    left: spacing[6],
-    right: spacing[6],
-    height: 2,
-    backgroundColor: colors.accent[500],
-    opacity: 0.2,
-    borderRadius: 1,
+    justifyContent: 'flex-start',
   },
 });

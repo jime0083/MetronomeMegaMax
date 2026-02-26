@@ -8,22 +8,17 @@ import {
 } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 import { useResponsive } from '@/hooks/useResponsive';
+import { UserMenu } from '../auth';
 
 interface HeaderProps {
   onLanguagePress?: () => void;
-  onSubscriptionPress?: () => void;
-  onLoginPress?: () => void;
   onMenuPress?: () => void;
-  isLoggedIn?: boolean;
   language?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onLanguagePress,
-  onSubscriptionPress,
-  onLoginPress,
   onMenuPress,
-  isLoggedIn = false,
   language = 'JA',
 }) => {
   const { isMobile } = useResponsive();
@@ -37,20 +32,23 @@ export const Header: React.FC<HeaderProps> = ({
           accessibilityLabel="Change language"
         >
           <Text style={styles.languageText}>{language}</Text>
-          <Text style={styles.chevron}>▾</Text>
+          <Text style={styles.chevron}>{'\u25BE'}</Text>
         </TouchableOpacity>
 
         <Text style={styles.logoMobile}>MMM</Text>
 
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={onMenuPress}
-          accessibilityLabel="Open menu"
-        >
-          <View style={styles.menuLine} />
-          <View style={styles.menuLine} />
-          <View style={styles.menuLine} />
-        </TouchableOpacity>
+        <View style={styles.mobileRightActions}>
+          <UserMenu compact />
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={onMenuPress}
+            accessibilityLabel="Open menu"
+          >
+            <View style={styles.menuLine} />
+            <View style={styles.menuLine} />
+            <View style={styles.menuLine} />
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -69,24 +67,10 @@ export const Header: React.FC<HeaderProps> = ({
           onPress={onLanguagePress}
         >
           <Text style={styles.headerButtonText}>{language}</Text>
-          <Text style={styles.chevronSmall}>▾</Text>
+          <Text style={styles.chevronSmall}>{'\u25BE'}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={onSubscriptionPress}
-        >
-          <Text style={styles.headerButtonText}>Premium</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.headerButton, styles.loginButton]}
-          onPress={onLoginPress}
-        >
-          <Text style={styles.loginButtonText}>
-            {isLoggedIn ? 'Account' : 'Login'}
-          </Text>
-        </TouchableOpacity>
+        <UserMenu />
       </View>
     </View>
   );
@@ -100,26 +84,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[3],
-    backgroundColor: colors.background.dark,
+    backgroundColor: colors.background.primary,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface.dark,
+    borderBottomColor: colors.border.light,
   },
   languageButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[2],
-    backgroundColor: colors.surface.dark,
+    backgroundColor: colors.surface.primary,
     borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.primary,
   },
   languageText: {
-    color: colors.text.dark.primary,
+    color: colors.text.primary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.semibold,
     letterSpacing: 1,
   },
   chevron: {
-    color: colors.text.dark.secondary,
+    color: colors.text.secondary,
     fontSize: typography.fontSize.xs,
     marginLeft: spacing[1],
   },
@@ -129,6 +115,11 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.black,
     letterSpacing: 4,
   },
+  mobileRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[3],
+  },
   menuButton: {
     padding: spacing[2],
     gap: 4,
@@ -136,7 +127,7 @@ const styles = StyleSheet.create({
   menuLine: {
     width: 22,
     height: 2,
-    backgroundColor: colors.text.dark.primary,
+    backgroundColor: colors.text.primary,
     borderRadius: 1,
   },
 
@@ -147,9 +138,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: spacing[8],
     paddingVertical: spacing[4],
-    backgroundColor: colors.background.dark,
+    backgroundColor: colors.background.primary,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface.dark,
+    borderBottomColor: colors.border.light,
   },
   logoContainer: {
     flexDirection: 'row',
@@ -157,7 +148,7 @@ const styles = StyleSheet.create({
     gap: spacing[2],
   },
   logo: {
-    color: colors.text.dark.primary,
+    color: colors.text.primary,
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
     letterSpacing: 3,
@@ -185,22 +176,13 @@ const styles = StyleSheet.create({
     }),
   },
   headerButtonText: {
-    color: colors.text.dark.secondary,
+    color: colors.text.secondary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.medium,
   },
   chevronSmall: {
-    color: colors.text.dark.tertiary,
+    color: colors.text.tertiary,
     fontSize: 10,
     marginLeft: spacing[1],
-  },
-  loginButton: {
-    backgroundColor: colors.accent[500],
-    paddingHorizontal: spacing[5],
-  },
-  loginButtonText: {
-    color: colors.background.dark,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.bold,
   },
 });

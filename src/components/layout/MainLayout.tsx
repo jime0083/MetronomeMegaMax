@@ -1,16 +1,18 @@
 import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
+  Text,
   StyleSheet,
   ScrollView,
   Dimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from './Header';
-import { colors, spacing } from '@/constants/theme';
+import { colors, spacing, typography, borderRadius } from '@/constants/theme';
 import { useResponsive } from '@/hooks/useResponsive';
 import type { PanelType } from '@/types';
 
@@ -19,10 +21,7 @@ interface MainLayoutProps {
   timerPanel: React.ReactNode;
   audioPanel: React.ReactNode;
   onLanguagePress?: () => void;
-  onSubscriptionPress?: () => void;
-  onLoginPress?: () => void;
   onMenuPress?: () => void;
-  isLoggedIn?: boolean;
   language?: string;
 }
 
@@ -33,10 +32,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   timerPanel,
   audioPanel,
   onLanguagePress,
-  onSubscriptionPress,
-  onLoginPress,
   onMenuPress,
-  isLoggedIn,
   language,
 }) => {
   const { columnsLayout, isMobile, showSidebar, showBothSidebars, width } = useResponsive();
@@ -64,16 +60,27 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     [width]
   );
 
+  const goToPreviousPanel = useCallback(() => {
+    const currentIndex = PANEL_INDICATORS.indexOf(activePanel);
+    if (currentIndex > 0) {
+      scrollToPanel(PANEL_INDICATORS[currentIndex - 1]);
+    }
+  }, [activePanel, scrollToPanel]);
+
+  const goToNextPanel = useCallback(() => {
+    const currentIndex = PANEL_INDICATORS.indexOf(activePanel);
+    if (currentIndex < PANEL_INDICATORS.length - 1) {
+      scrollToPanel(PANEL_INDICATORS[currentIndex + 1]);
+    }
+  }, [activePanel, scrollToPanel]);
+
   // Desktop layout - 3 columns
   if (columnsLayout) {
     return (
       <SafeAreaView style={styles.container}>
         <Header
           onLanguagePress={onLanguagePress}
-          onSubscriptionPress={onSubscriptionPress}
-          onLoginPress={onLoginPress}
           onMenuPress={onMenuPress}
-          isLoggedIn={isLoggedIn}
           language={language}
         />
 
@@ -98,26 +105,56 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     );
   }
 
-  // Mobile layout - Swipeable panels
+  // Mobile layout - Swipeable panels with navigation arrows
+  const currentIndex = PANEL_INDICATORS.indexOf(activePanel);
+  const canGoBack = currentIndex > 0;
+  const canGoForward = currentIndex < PANEL_INDICATORS.length - 1;
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
         onLanguagePress={onLanguagePress}
-        onSubscriptionPress={onSubscriptionPress}
-        onLoginPress={onLoginPress}
         onMenuPress={onMenuPress}
-        isLoggedIn={isLoggedIn}
         language={language}
       />
 
-      {/* Panel Indicators */}
-      <View style={styles.indicators}>
-        {PANEL_INDICATORS.map((panel) => (
-          <View
-            key={panel}
-            style={[styles.indicator, activePanel === panel && styles.indicatorActive]}
-          />
-        ))}
+      {/* Panel Navigation */}
+      <View style={styles.panelNavigation}>
+        {/* Left Arrow */}
+        <TouchableOpacity
+          style={[styles.navArrow, !canGoBack && styles.navArrowDisabled]}
+          onPress={goToPreviousPanel}
+          disabled={!canGoBack}
+          accessibilityLabel="Previous panel"
+        >
+          <Text style={[styles.navArrowText, !canGoBack && styles.navArrowTextDisabled]}>
+            {'<'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Panel Indicators */}
+        <View style={styles.indicators}>
+          {PANEL_INDICATORS.map((panel) => (
+            <TouchableOpacity
+              key={panel}
+              style={[styles.indicator, activePanel === panel && styles.indicatorActive]}
+              onPress={() => scrollToPanel(panel)}
+              accessibilityLabel={`Go to ${panel} panel`}
+            />
+          ))}
+        </View>
+
+        {/* Right Arrow */}
+        <TouchableOpacity
+          style={[styles.navArrow, !canGoForward && styles.navArrowDisabled]}
+          onPress={goToNextPanel}
+          disabled={!canGoForward}
+          accessibilityLabel="Next panel"
+        >
+          <Text style={[styles.navArrowText, !canGoForward && styles.navArrowTextDisabled]}>
+            {'>'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Swipeable Panels */}
@@ -145,7 +182,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.dark,
+    backgroundColor: colors.background.primary,
   },
 
   // Desktop styles
@@ -165,34 +202,70 @@ const styles = StyleSheet.create({
   },
   adSidebar: {
     width: 160,
-    backgroundColor: colors.surface.dark,
-    borderRadius: 8,
-    opacity: 0.5, // Placeholder visibility
+    backgroundColor: colors.surface.border,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    opacity: 0.5,
   },
   adBannerBottom: {
     height: 90,
-    backgroundColor: colors.surface.dark,
+    backgroundColor: colors.surface.border,
     marginHorizontal: spacing[6],
     marginBottom: spacing[4],
-    borderRadius: 8,
-    opacity: 0.5, // Placeholder visibility
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    opacity: 0.5,
   },
 
   // Mobile styles
+  panelNavigation: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[2],
+  },
+  navArrow: {
+    width: 40,
+    height: 40,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.surface.primary,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navArrowDisabled: {
+    borderColor: colors.border.light,
+    backgroundColor: colors.background.tertiary,
+  },
+  navArrowText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize['2xl'],
+    fontWeight: typography.fontWeight.bold,
+    marginTop: -2,
+  },
+  navArrowTextDisabled: {
+    color: colors.text.disabled,
+  },
   indicators: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: spacing[2],
-    paddingVertical: spacing[3],
   },
   indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.surface.darkElevated,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.surface.border,
+    borderWidth: 1,
+    borderColor: colors.border.secondary,
   },
   indicatorActive: {
     backgroundColor: colors.accent[500],
+    borderColor: colors.accent[600],
     width: 24,
   },
   mobileScrollView: {
@@ -206,10 +279,12 @@ const styles = StyleSheet.create({
   },
   adBannerBottomMobile: {
     height: 50,
-    backgroundColor: colors.surface.dark,
+    backgroundColor: colors.surface.border,
     marginHorizontal: spacing[4],
     marginBottom: spacing[2],
-    borderRadius: 8,
-    opacity: 0.5, // Placeholder visibility
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    opacity: 0.5,
   },
 });

@@ -1,6 +1,6 @@
-// Color palette - Deep, rich tones for a professional music app
+// Color palette - Clean, light theme for a professional music app
 export const colors = {
-  // Primary palette - Deep midnight blue with warm accents
+  // Primary palette - Deep blue for accents
   primary: {
     50: '#e8f0ff',
     100: '#c5d9ff',
@@ -14,52 +14,47 @@ export const colors = {
     900: '#1a3d80',
   },
 
-  // Accent - Warm amber/gold for highlights
+  // Accent - Warm orange for pendulum and highlights
   accent: {
-    50: '#fff8e6',
-    100: '#ffecbf',
-    200: '#ffdf94',
-    300: '#ffd269',
-    400: '#ffc847',
-    500: '#ffbe25',
-    600: '#f0a800',
-    700: '#cc8f00',
-    800: '#a87600',
-    900: '#805a00',
+    50: '#fff5e6',
+    100: '#ffe4bf',
+    200: '#ffd194',
+    300: '#ffbd69',
+    400: '#ffac47',
+    500: '#ff9800', // Main orange accent
+    600: '#f08c00',
+    700: '#cc7600',
+    800: '#a86000',
+    900: '#804a00',
   },
 
-  // Background colors
+  // Background colors - Light theme
   background: {
-    dark: '#0a0a12',
-    darkSecondary: '#12121f',
-    darkTertiary: '#1a1a2e',
-    light: '#f8f9fc',
-    lightSecondary: '#ffffff',
-    lightTertiary: '#eef1f6',
+    primary: '#f5f5f5', // Main background
+    secondary: '#ffffff', // Cards/panels
+    tertiary: '#ebebeb', // Subtle sections
   },
 
   // Surface colors (cards, panels)
   surface: {
-    dark: '#16162a',
-    darkElevated: '#1e1e38',
-    light: '#ffffff',
-    lightElevated: '#f5f7fa',
+    primary: '#ffffff',
+    elevated: '#fafafa',
+    border: '#e0e0e0',
   },
 
   // Text colors
   text: {
-    dark: {
-      primary: '#ffffff',
-      secondary: '#a0a0b8',
-      tertiary: '#6b6b80',
-      disabled: '#454560',
-    },
-    light: {
-      primary: '#1a1a2e',
-      secondary: '#5a5a72',
-      tertiary: '#8a8a9e',
-      disabled: '#b5b5c5',
-    },
+    primary: '#1a1a1a', // Main text
+    secondary: '#666666', // Secondary text
+    tertiary: '#999999', // Hints, placeholders
+    disabled: '#cccccc',
+  },
+
+  // Border colors
+  border: {
+    primary: '#333333', // Main borders
+    secondary: '#999999', // Secondary borders
+    light: '#e0e0e0', // Light borders
   },
 
   // Status colors
@@ -70,16 +65,16 @@ export const colors = {
 
   // Beat indicator colors
   beat: {
-    inactive: '#2a2a45',
-    active: '#ffbe25',
+    inactive: '#e0e0e0',
+    active: '#ff9800',
     accent: '#ff6b35',
   },
 
   // Transparent overlays
   overlay: {
-    dark: 'rgba(10, 10, 18, 0.8)',
-    medium: 'rgba(10, 10, 18, 0.5)',
-    light: 'rgba(10, 10, 18, 0.3)',
+    dark: 'rgba(0, 0, 0, 0.6)',
+    medium: 'rgba(0, 0, 0, 0.4)',
+    light: 'rgba(0, 0, 0, 0.2)',
   },
 } as const;
 
@@ -150,29 +145,29 @@ export const shadows = {
   sm: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 2,
   },
   md: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     elevation: 4,
   },
   lg: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
     elevation: 8,
   },
   glow: {
-    shadowColor: '#ffbe25',
+    shadowColor: '#ff9800',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
     elevation: 10,
   },
 } as const;

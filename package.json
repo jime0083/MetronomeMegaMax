@@ -15,12 +15,25 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^8.8.0",
+    "audio-player-module": "./modules/audio-player-module",
+    "babel-preset-expo": "^54.0.10",
     "expo": "~54.0.33",
+    "expo-auth-session": "^7.0.10",
+    "expo-constants": "^18.0.13",
+    "expo-crypto": "^15.0.8",
+    "expo-modules-core": "~3.0.29",
     "expo-status-bar": "~3.0.9",
+    "expo-web-browser": "^15.0.10",
+    "firebase": "^12.9.0",
+    "metronome-module": "./modules/metronome-module",
     "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-native": "0.81.5",
+    "react-native-purchases": "^9.10.4",
     "react-native-safe-area-context": "~5.4.0",
-    "react-native-screens": "~4.10.0"
+    "react-native-screens": "~4.10.0",
+    "react-native-web": "^0.21.0"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",

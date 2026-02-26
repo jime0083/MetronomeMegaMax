@@ -7,7 +7,7 @@ import {
   Platform,
 } from 'react-native';
 import { Panel } from '@/components/layout/Panel';
-import { colors, typography, spacing, borderRadius, shadows } from '@/constants/theme';
+import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 import type { PlaybackSpeed } from '@/types';
 import { PLAYBACK_SPEEDS } from '@/constants';
 
@@ -85,14 +85,6 @@ export const AudioPlayerPanel: React.FC<AudioPlayerPanelProps> = ({
     return (loopEnd / duration) * 100;
   }, [loopEnd, duration]);
 
-  const handleSeekBarPress = useCallback(
-    (event: { nativeEvent: { locationX: number } }, width: number) => {
-      const percent = event.nativeEvent.locationX / width;
-      onSeek(percent * duration);
-    },
-    [duration, onSeek]
-  );
-
   const hasFile = !!fileName;
 
   return (
@@ -100,35 +92,44 @@ export const AudioPlayerPanel: React.FC<AudioPlayerPanelProps> = ({
       {/* File Info */}
       <View style={styles.fileInfoContainer}>
         {fileName ? (
-          <>
-            <View style={styles.fileIcon}>
-              <Text style={styles.fileIconText}>♪</Text>
-            </View>
-            <Text style={styles.fileName} numberOfLines={1}>
-              {fileName}
-            </Text>
-          </>
+          <Text style={styles.fileName} numberOfLines={1}>
+            {fileName}
+          </Text>
         ) : (
           <Text style={styles.noFileText}>No file selected</Text>
         )}
       </View>
 
-      {/* Waveform Visualization (simplified) */}
-      <View style={styles.waveformContainer}>
-        {Array.from({ length: 40 }).map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.waveformBar,
-              {
-                height: 10 + Math.sin(index * 0.3) * 20 + Math.random() * 15,
-                opacity: hasFile ? (index * 2.5 < progressPercent ? 1 : 0.3) : 0.15,
-                backgroundColor:
-                  index * 2.5 < progressPercent ? colors.accent[500] : colors.surface.darkElevated,
-              },
-            ]}
-          />
-        ))}
+      {/* Playback Controls */}
+      <View style={styles.controlsContainer}>
+        <TouchableOpacity
+          style={[styles.skipButton, !hasFile && styles.buttonDisabled]}
+          onPress={onSkipBack}
+          disabled={!hasFile}
+          accessibilityLabel="Skip back 15 seconds"
+        >
+          <Text style={[styles.skipButtonText, !hasFile && styles.disabledText]}>-15</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.playButton, !hasFile && styles.playButtonDisabled]}
+          onPress={isPlaying ? onPause : onPlay}
+          disabled={!hasFile}
+          accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
+        >
+          <Text style={[styles.playButtonIcon, !hasFile && styles.disabledText]}>
+            {isPlaying ? '❚❚' : '▶'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.skipButton, !hasFile && styles.buttonDisabled]}
+          onPress={onSkipForward}
+          disabled={!hasFile}
+          accessibilityLabel="Skip forward 15 seconds"
+        >
+          <Text style={[styles.skipButtonText, !hasFile && styles.disabledText]}>+15</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Seek Bar */}
@@ -152,12 +153,12 @@ export const AudioPlayerPanel: React.FC<AudioPlayerPanelProps> = ({
 
           {/* Loop markers */}
           {isPremium && loopStartPercent !== null && (
-            <View style={[styles.loopMarker, styles.loopMarkerStart, { left: `${loopStartPercent}%` }]}>
+            <View style={[styles.loopMarker, { left: `${loopStartPercent}%` }]}>
               <Text style={styles.loopMarkerText}>A</Text>
             </View>
           )}
           {isPremium && loopEndPercent !== null && (
-            <View style={[styles.loopMarker, styles.loopMarkerEnd, { left: `${loopEndPercent}%` }]}>
+            <View style={[styles.loopMarker, { left: `${loopEndPercent}%` }]}>
               <Text style={styles.loopMarkerText}>B</Text>
             </View>
           )}
@@ -173,48 +174,17 @@ export const AudioPlayerPanel: React.FC<AudioPlayerPanelProps> = ({
         </View>
       </View>
 
-      {/* Playback Controls */}
-      <View style={styles.controlsContainer}>
-        <TouchableOpacity
-          style={styles.skipButton}
-          onPress={onSkipBack}
-          disabled={!hasFile}
-          accessibilityLabel="Skip back 15 seconds"
-        >
-          <Text style={[styles.skipButtonText, !hasFile && styles.disabledText]}>-15</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.playButton, !hasFile && styles.playButtonDisabled]}
-          onPress={isPlaying ? onPause : onPlay}
-          disabled={!hasFile}
-          accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
-        >
-          <Text style={styles.playButtonIcon}>{isPlaying ? '❚❚' : '▶'}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.skipButton}
-          onPress={onSkipForward}
-          disabled={!hasFile}
-          accessibilityLabel="Skip forward 15 seconds"
-        >
-          <Text style={[styles.skipButtonText, !hasFile && styles.disabledText]}>+15</Text>
-        </TouchableOpacity>
-      </View>
-
       {/* A-B Loop Controls (Premium) */}
       {isPremium && hasFile && (
         <View style={styles.loopControlsContainer}>
-          <TouchableOpacity
-            style={[styles.loopPointButton, loopStart !== null && styles.loopPointButtonActive]}
-            onPress={onSetLoopStart}
-          >
-            <Text style={styles.loopPointButtonText}>A</Text>
-            {loopStart !== null && (
-              <Text style={styles.loopPointTime}>{formatTime(loopStart)}</Text>
-            )}
-          </TouchableOpacity>
+          <View style={styles.loopInputContainer}>
+            <Text style={styles.loopInputLabel}>A</Text>
+            <View style={styles.loopInput}>
+              <Text style={styles.loopInputText}>
+                {loopStart !== null ? formatTime(loopStart) : '00:00'}
+              </Text>
+            </View>
+          </View>
 
           <TouchableOpacity
             style={[styles.loopToggleButton, isLooping && styles.loopToggleButtonActive]}
@@ -226,13 +196,14 @@ export const AudioPlayerPanel: React.FC<AudioPlayerPanelProps> = ({
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.loopPointButton, loopEnd !== null && styles.loopPointButtonActive]}
-            onPress={onSetLoopEnd}
-          >
-            <Text style={styles.loopPointButtonText}>B</Text>
-            {loopEnd !== null && <Text style={styles.loopPointTime}>{formatTime(loopEnd)}</Text>}
-          </TouchableOpacity>
+          <View style={styles.loopInputContainer}>
+            <Text style={styles.loopInputLabel}>B</Text>
+            <View style={styles.loopInput}>
+              <Text style={styles.loopInputText}>
+                {loopEnd !== null ? formatTime(loopEnd) : '00:00'}
+              </Text>
+            </View>
+          </View>
         </View>
       )}
 
@@ -240,24 +211,10 @@ export const AudioPlayerPanel: React.FC<AudioPlayerPanelProps> = ({
       {isPremium && hasFile && (
         <View style={styles.speedControlContainer}>
           <Text style={styles.speedLabel}>SPEED</Text>
-          <View style={styles.speedOptions}>
-            {PLAYBACK_SPEEDS.map((speed) => (
-              <TouchableOpacity
-                key={speed}
-                style={[styles.speedOption, playbackSpeed === speed && styles.speedOptionActive]}
-                onPress={() => onSpeedChange?.(speed)}
-              >
-                <Text
-                  style={[
-                    styles.speedOptionText,
-                    playbackSpeed === speed && styles.speedOptionTextActive,
-                  ]}
-                >
-                  {speed}x
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <TouchableOpacity style={styles.speedSelector}>
+            <Text style={styles.speedSelectorText}>{playbackSpeed}x</Text>
+            <Text style={styles.speedChevron}>▾</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -274,14 +231,10 @@ export const AudioPlayerPanel: React.FC<AudioPlayerPanelProps> = ({
         )}
       </View>
 
-      {isPremium && (
-        <Text style={styles.fileSizeNote}>Max file size: 20MB (mp3, wav)</Text>
-      )}
-
       {/* Save Loop Point (Premium) */}
-      {isPremium && loopStart !== null && loopEnd !== null && (
+      {isPremium && hasFile && (
         <TouchableOpacity style={styles.saveButton} onPress={onSaveLoopPoint}>
-          <Text style={styles.saveButtonText}>SAVE LOOP</Text>
+          <Text style={styles.saveButtonText}>SAVE</Text>
         </TouchableOpacity>
       )}
     </Panel>
@@ -291,59 +244,82 @@ export const AudioPlayerPanel: React.FC<AudioPlayerPanelProps> = ({
 const styles = StyleSheet.create({
   // File Info
   fileInfoContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing[4],
-    gap: spacing[2],
-  },
-  fileIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.accent[500],
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fileIconText: {
-    color: colors.background.dark,
-    fontSize: typography.fontSize.lg,
+    marginTop: spacing[2],
   },
   fileName: {
-    color: colors.text.dark.primary,
+    color: colors.text.primary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.medium,
     maxWidth: 200,
   },
   noFileText: {
-    color: colors.text.dark.tertiary,
+    color: colors.text.tertiary,
     fontSize: typography.fontSize.sm,
     fontStyle: 'italic',
   },
 
-  // Waveform
-  waveformContainer: {
+  // Playback Controls
+  controlsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 60,
-    gap: 2,
+    gap: spacing[4],
     marginBottom: spacing[4],
   },
-  waveformBar: {
-    width: 4,
-    borderRadius: 2,
+  skipButton: {
+    width: 52,
+    height: 52,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.surface.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.border.primary,
+  },
+  buttonDisabled: {
+    borderColor: colors.border.light,
+  },
+  skipButtonText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.bold,
+    fontFamily: typography.fontFamily.mono,
+  },
+  playButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.surface.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.border.primary,
+  },
+  playButtonDisabled: {
+    borderColor: colors.border.light,
+  },
+  playButtonIcon: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.xl,
+    marginLeft: 2,
+  },
+  disabledText: {
+    color: colors.text.disabled,
   },
 
   // Seek Bar
   seekBarContainer: {
     width: '100%',
-    marginBottom: spacing[6],
+    marginBottom: spacing[4],
+    paddingHorizontal: spacing[2],
   },
   seekBarTrack: {
-    height: 6,
-    backgroundColor: colors.surface.darkElevated,
-    borderRadius: 3,
+    height: 8,
+    backgroundColor: colors.surface.border,
+    borderRadius: 4,
     position: 'relative',
     overflow: 'visible',
   },
@@ -353,43 +329,41 @@ const styles = StyleSheet.create({
     top: 0,
     height: '100%',
     backgroundColor: colors.accent[500],
-    borderRadius: 3,
+    borderRadius: 4,
   },
   loopRegion: {
     position: 'absolute',
     top: -2,
-    height: 10,
-    backgroundColor: 'rgba(255, 190, 37, 0.2)',
+    height: 12,
+    backgroundColor: 'rgba(255, 152, 0, 0.2)',
     borderRadius: 2,
   },
   loopMarker: {
     position: 'absolute',
-    top: -14,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    top: -12,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: colors.accent[500],
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: -9,
+    marginLeft: -8,
   },
-  loopMarkerStart: {},
-  loopMarkerEnd: {},
   loopMarkerText: {
-    color: colors.background.dark,
+    color: colors.surface.primary,
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.black,
   },
   playhead: {
     position: 'absolute',
     top: -4,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: colors.text.dark.primary,
-    marginLeft: -7,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: colors.surface.primary,
+    marginLeft: -8,
     borderWidth: 2,
-    borderColor: colors.accent[500],
+    borderColor: colors.border.primary,
   },
   timeDisplay: {
     flexDirection: 'row',
@@ -397,55 +371,9 @@ const styles = StyleSheet.create({
     marginTop: spacing[2],
   },
   timeText: {
-    color: colors.text.dark.secondary,
+    color: colors.text.secondary,
     fontSize: typography.fontSize.xs,
     fontFamily: typography.fontFamily.mono,
-  },
-
-  // Playback Controls
-  controlsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing[4],
-    marginBottom: spacing[6],
-  },
-  skipButton: {
-    width: 52,
-    height: 52,
-    borderRadius: borderRadius.lg,
-    backgroundColor: colors.surface.darkElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.text.dark.tertiary,
-  },
-  skipButtonText: {
-    color: colors.text.dark.primary,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.bold,
-    fontFamily: typography.fontFamily.mono,
-  },
-  playButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: colors.accent[500],
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadows.glow,
-  },
-  playButtonDisabled: {
-    backgroundColor: colors.surface.darkElevated,
-    shadowOpacity: 0,
-  },
-  playButtonIcon: {
-    color: colors.background.dark,
-    fontSize: typography.fontSize['2xl'],
-    marginLeft: 3,
-  },
-  disabledText: {
-    color: colors.text.dark.disabled,
   },
 
   // Loop Controls
@@ -456,87 +384,85 @@ const styles = StyleSheet.create({
     gap: spacing[3],
     marginBottom: spacing[4],
   },
-  loopPointButton: {
+  loopInputContainer: {
     alignItems: 'center',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[2],
-    backgroundColor: colors.surface.darkElevated,
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.text.dark.tertiary,
-    minWidth: 60,
   },
-  loopPointButtonActive: {
-    borderColor: colors.accent[500],
-    backgroundColor: 'rgba(255, 190, 37, 0.1)',
-  },
-  loopPointButtonText: {
-    color: colors.text.dark.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.black,
-  },
-  loopPointTime: {
-    color: colors.text.dark.secondary,
+  loopInputLabel: {
+    color: colors.text.secondary,
     fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+    marginBottom: spacing[1],
+  },
+  loopInput: {
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[2],
+    backgroundColor: colors.surface.primary,
+    borderRadius: borderRadius.md,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
+    minWidth: 70,
+    alignItems: 'center',
+  },
+  loopInputText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.sm,
     fontFamily: typography.fontFamily.mono,
-    marginTop: spacing[1],
   },
   loopToggleButton: {
     paddingHorizontal: spacing[5],
     paddingVertical: spacing[3],
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.full,
     borderWidth: 2,
-    borderColor: colors.text.dark.tertiary,
+    borderColor: colors.border.primary,
+    backgroundColor: colors.surface.primary,
   },
   loopToggleButtonActive: {
     borderColor: colors.accent[500],
     backgroundColor: colors.accent[500],
   },
   loopToggleText: {
-    color: colors.text.dark.secondary,
+    color: colors.text.primary,
     fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.black,
+    fontWeight: typography.fontWeight.bold,
     letterSpacing: 2,
   },
   loopToggleTextActive: {
-    color: colors.background.dark,
+    color: colors.surface.primary,
   },
 
   // Speed Control
   speedControlContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing[3],
     marginBottom: spacing[4],
   },
   speedLabel: {
-    color: colors.text.dark.tertiary,
-    fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.bold,
-    letterSpacing: 2,
-    marginBottom: spacing[2],
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
   },
-  speedOptions: {
+  speedSelector: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: spacing[1],
+    alignItems: 'center',
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[2],
+    backgroundColor: colors.surface.primary,
+    borderRadius: borderRadius.md,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
   },
-  speedOption: {
-    paddingHorizontal: spacing[2],
-    paddingVertical: spacing[1],
-    borderRadius: borderRadius.sm,
-    backgroundColor: colors.surface.darkElevated,
-  },
-  speedOptionActive: {
-    backgroundColor: colors.accent[500],
-  },
-  speedOptionText: {
-    color: colors.text.dark.secondary,
-    fontSize: typography.fontSize.xs,
+  speedSelectorText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.base,
     fontWeight: typography.fontWeight.semibold,
     fontFamily: typography.fontFamily.mono,
   },
-  speedOptionTextActive: {
-    color: colors.background.dark,
+  speedChevron: {
+    color: colors.text.tertiary,
+    fontSize: typography.fontSize.xs,
+    marginLeft: spacing[2],
   },
 
   // File Actions
@@ -544,18 +470,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: spacing[3],
-    marginBottom: spacing[2],
+    marginBottom: spacing[3],
   },
   selectFileButton: {
     paddingHorizontal: spacing[5],
     paddingVertical: spacing[3],
-    backgroundColor: colors.surface.darkElevated,
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.text.dark.tertiary,
+    backgroundColor: colors.surface.primary,
+    borderRadius: borderRadius.full,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
   },
   selectFileButtonText: {
-    color: colors.text.dark.primary,
+    color: colors.text.primary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
     letterSpacing: 1,
@@ -564,19 +490,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[5],
     paddingVertical: spacing[3],
     backgroundColor: colors.accent[500],
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.full,
+    borderWidth: 2,
+    borderColor: colors.accent[600],
   },
   uploadButtonText: {
-    color: colors.background.dark,
+    color: colors.surface.primary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
     letterSpacing: 1,
-  },
-  fileSizeNote: {
-    color: colors.text.dark.tertiary,
-    fontSize: typography.fontSize.xs,
-    textAlign: 'center',
-    marginBottom: spacing[4],
   },
 
   // Save Button
@@ -584,12 +506,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[6],
     paddingVertical: spacing[2],
     borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.accent[500],
+    borderWidth: 2,
+    borderColor: colors.border.secondary,
     alignSelf: 'center',
   },
   saveButtonText: {
-    color: colors.accent[500],
+    color: colors.text.secondary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.bold,
     letterSpacing: 2,

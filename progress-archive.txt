@@ -37,6 +37,283 @@
 - [x] 設定ファイルをプロジェクトに配置（ios/config/）
 - [x] .gitignore に追加
 
+**2. Apple Developer / App Store Connect 設定**
+
+2.1 Apple Developer Program
+- [x] Apple Developer Program への登録（年間 $99）
+- [x] App ID の作成（Bundle ID 登録済み）
+
+2.2 App Store Connect
+- [x] App Store Connect で新規 App を作成
+- [x] App 情報の入力
+  - App 名: MetronomeMegaMax
+  - プライマリ言語: 日本語
+  - カテゴリ: ミュージック
+
+---
+
+#### progress.txt より
+
+**Phase 0: プロジェクトセットアップ** ✅ 完了（2026-02-24）
+
+0.1 開発環境構築
+- [x] Node.js / npm のバージョン確認（v24.9.0 / 11.6.0）
+- [x] Expo CLI のインストール
+- [x] Xcode のインストール・設定（Xcode 16.4）
+- [x] iOS Simulator の設定
+
+0.2 プロジェクト初期化
+- [x] Expo プロジェクト作成（TypeScript テンプレート）
+- [x] React Native for Web の設定
+- [x] ESLint / Prettier の設定
+- [x] Git リポジトリの初期化
+- [x] .gitignore の設定
+- [x] babel.config.js（パスエイリアス設定）
+- [x] tsconfig.json（strict mode, パスエイリアス）
+
+0.3 ディレクトリ構造の設計
+- [x] src/ 以下のフォルダ構成を決定
+- [x] components/, screens/, hooks/, utils/, services/ 等の作成
+- [x] 多言語対応（i18n）のフォルダ構成
+
+---
+
+**Phase 1: 基盤実装** ✅ 完了（2026-02-24）
+
+1.1 レイアウト基盤
+- [x] レスポンシブレイアウトのブレークポイント定義（1440px, 1280px, 1120px）
+- [x] メインレイアウトコンポーネント（Web横並び / スライダー切り替え）
+- [x] ヘッダーコンポーネント（Web版）
+- [x] ヘッダーコンポーネント（iOS版 / 1120px未満）
+- [x] 広告配置用コンポーネント（プレースホルダー）
+
+1.2 共通UIコンポーネント
+- [x] パネルコンポーネント
+- [x] メトロノームパネル（振り子アニメーション、ビートインジケーター）
+- [x] タイマーパネル（時間表示、加算ボタン）
+- [x] 音源再生パネル（シークバー、A-Bループ、速度制御）
+
+1.3 多言語対応（i18n）
+- [x] i18n 基盤実装（翻訳タイプ定義）
+- [x] 日本語翻訳ファイル作成
+- [x] 英語翻訳ファイル作成
+- [x] スペイン語翻訳ファイル作成
+- [x] useTranslation フック
+
+---
+
+### 2026-02-25 完了
+
+#### progress.txt より
+
+**Phase 2: メトロノーム機能** ✅ 完了（2026-02-25）
+
+2.1 メトロノームUI
+- [x] メトロノームパネルのレイアウト
+- [x] BPM表示（大きな数字）
+- [x] ±ボタンによるBPM調整
+- [x] 振り子アニメーションの実装
+- [x] ビートインジケーター（拍子に応じた丸印）の実装
+- [x] 拍子セレクター（ドロップダウン）
+- [x] アクセントセレクター（ドロップダウン）
+- [x] START/STOPボタン
+
+2.2 メトロノームオーディオエンジン（iOS）
+- [x] Swift ネイティブモジュールの作成（modules/metronome-module/）
+- [x] AVAudioEngine を使用したオーディオ再生
+- [x] Look-ahead スケジューリングの実装（25ms間隔、100ms先読み）
+- [x] BPM変更時のリアルタイム反映
+- [x] 拍子変更時の対応
+- [x] アクセントパターンの実装（3パターン）
+- [x] React Native との Bridge 実装
+
+2.3 メトロノームオーディオエンジン（Web）
+- [x] Web Audio API を使用したオーディオ再生
+- [x] AudioContext によるスケジューリング
+- [x] Look-ahead パターンの実装
+- [x] BPM/拍子/アクセントの対応
+
+2.4 メトロノームクリック音
+- [x] クリック音の音声ファイル準備（オシレーター合成で実装）
+- [x] 音声ファイルのバンドル設定（assets/audioディレクトリ準備済）
+
+---
+
+**Phase 3: タイマー機能** ✅ 完了（2026-02-25）
+
+3.1 タイマーUI
+- [x] タイマーパネルのレイアウト
+- [x] 時間表示（HH:MM:SS）
+- [x] 加算ボタン群（30秒/1分/3分/5分/10分/30分）
+- [x] 「時間を選択」ドロップダウン
+- [x] START/一時停止ボタン
+- [x] SAVEボタン
+
+3.2 タイマーロジック
+- [x] カウントダウンロジックの実装（useTimerフック）
+- [x] 一時停止/再開機能
+- [x] リセット機能
+- [x] 終了時アラーム音の再生（Web Audio API）
+
+---
+
+**Phase 4: 音源再生機能** ✅ 完了（2026-02-25）
+
+4.1 音源再生UI
+- [x] 音源再生パネルのレイアウト
+- [x] 15秒戻る/進むボタン
+- [x] 再生/一時停止ボタン
+- [x] シークバー
+- [x] A-B区間設定入力欄
+- [x] LOOPボタン
+- [x] 再生速度セレクター
+- [x] ファイル選択ボタン
+- [x] アップロードボタン
+- [x] SAVEボタン
+
+4.2 音源再生ロジック（iOS）
+- [x] AVAudioPlayer を使用した音源再生（modules/audio-player-module/）
+- [x] シーク機能
+- [x] 15秒スキップ機能
+- [x] メトロノームとの同時再生対応（AVAudioSession mixWithOthers）
+
+4.3 音源再生ロジック（Web）
+- [x] HTML5 Audio による再生（useAudioPlayerフック）
+- [x] シーク機能
+- [x] 15秒スキップ機能
+
+4.4 A-Bリピート機能（有料版）
+- [x] A点/B点の設定ロジック
+- [x] ループ再生の実装
+- [x] LOOPボタンによるオン/オフ切り替え
+
+4.5 再生速度変更（有料版）
+- [x] 再生速度変更ロジック（0.5x〜2x）
+- [x] ピッチ補正（preservesPitch）
+
+4.6 ファイル選択
+- [x] iOS: UIDocumentPickerViewController の実装
+- [x] Web: input type="file" の実装
+- [x] 対応フォーマット（mp3, wav）のフィルタリング
+- [x] エラーハンドリング
+
+---
+
+**Phase 5: 認証・課金** ✅ 完了（2026-02-25）
+
+5.1 Firebase Authentication
+- [x] Firebase SDK の導入（firebase, expo-auth-session, expo-constants）
+- [x] Firebase設定ファイル・初期化コード作成（src/services/firebase/）
+- [x] Google Sign-In の実装（iOS / Web 両対応）
+- [x] ログイン状態の管理（AuthContext）
+- [x] ログインポップアップUI（LoginModal, UserMenu）
+
+5.2 課金システム（iOS）
+- [x] RevenueCat SDK の導入（react-native-purchases）
+- [x] 購入フローの実装（src/services/payment/revenueCat.ts）
+- [x] 購入状態の復元
+- [x] 課金ポップアップUI（SubscriptionModal）
+- [!] App Store Connect での In-App Purchase 設定（手動作業：manual-work.txt 2.3）
+
+5.3 課金システム（Web）
+- [x] Stripe SDK の導入（@stripe/stripe-js）
+- [x] 課金ポップアップUI（SubscriptionModalに統合）
+- [~] Stripe Checkout / Webhook（Backend連携が必要）
+
+5.4 課金状態管理
+- [x] SubscriptionContext の実装
+- [x] Firestore での課金状態保存
+- [x] プラットフォーム間での課金状態同期
+- [x] 有料機能のアクセス制御実装
+
+5.5 解約機能
+- [x] iOS: App Store 経由の解約案内（設定画面リンク）
+- [~] Web: Stripe Customer Portal（Backend連携が必要）
+
+**作成ファイル:**
+- src/services/firebase/config.ts
+- src/services/firebase/auth.ts
+- src/services/firebase/firestore.ts
+- src/services/firebase/index.ts
+- src/services/payment/revenueCat.ts
+- src/services/payment/stripe.ts
+- src/services/payment/index.ts
+- src/contexts/AuthContext.tsx
+- src/contexts/SubscriptionContext.tsx
+- src/contexts/index.ts
+- src/hooks/useGoogleAuth.ts
+- src/components/auth/LoginModal.tsx
+- src/components/auth/UserMenu.tsx
+- src/components/auth/index.ts
+- src/components/subscription/SubscriptionModal.tsx
+- src/components/subscription/index.ts
+- app.config.js（環境変数対応）
+
+---
+
+**Phase 6: プリセット・クラウド同期** ✅ 完了（2026-02-25）
+
+6.1 Firestore データ設計
+- [x] ユーザーデータのコレクション設計（users）
+- [x] BPMプリセットのスキーマ設計（bpmPresets）
+- [x] タイマープリセットのスキーマ設計（timerPresets）
+- [x] ループポイントのスキーマ設計（loopPoints）
+
+6.2 BPMプリセット保存（有料版）
+- [x] プリセット保存ロジック（saveBpmPreset）
+- [x] プリセット読み込みロジック（getBpmPresets）
+- [x] プリセット削除ロジック（deleteBpmPreset）
+- [x] useBpmPresets フック
+
+6.3 タイマープリセット保存（有料版）
+- [x] プリセット保存ロジック（saveTimerPreset）
+- [x] プリセット読み込みロジック（getTimerPresets）
+- [x] useTimerPresets フック
+
+6.4 ループポイント保存（有料版）
+- [x] Firebase Storage への音源アップロード（uploadAudioFile）
+- [x] アップロード進捗表示
+- [x] ファイルサイズ検証（20MB制限）
+- [x] Firestore へのメタデータ保存（saveLoopPoint）
+- [x] ループポイント読み込み・キャッシュ
+
+**作成ファイル:**
+- src/services/presets/bpmPresets.ts
+- src/services/presets/timerPresets.ts
+- src/services/presets/loopPoints.ts
+- src/services/presets/index.ts
+- src/hooks/usePresets.ts
+
+---
+
+**Phase 7: 広告** ✅ 完了（2026-02-25）
+
+7.1 iOS広告（AdMob）
+- [x] 広告コンポーネントの作成（AdBanner）
+- [x] バナー広告の実装（下部）
+- [x] 有料版での広告非表示
+- [!] AdMob SDK の導入・設定（手動作業：manual-work.txt 5.1）
+
+7.2 Web広告（AdSense）
+- [x] 広告コンポーネントの作成
+- [x] サイドバー広告（160x600）の実装
+- [x] 下部広告（728x90）の実装
+- [x] レスポンシブ対応
+- [x] 有料版での広告非表示
+- [!] AdSense コードの設置（手動作業：manual-work.txt 5.2）
+
+**作成ファイル:**
+- src/components/ads/AdBanner.tsx
+- src/components/ads/index.ts
+
+---
+
+**Phase 8: バックグラウンド再生（iOS有料版）** ✅ 完了（2026-02-25）
+
+8.1 バックグラウンド対応
+- [x] Info.plist での Background Modes 設定（app.json: UIBackgroundModes: ["audio"]）
+- [x] AVAudioSession の設定（.playback）（MetronomeModule.swiftで実装済み）
+
 ---
 
 ## アーカイブ履歴
@@ -45,3 +322,13 @@
 |------|--------|-----------|
 | 2026-02-24 | manual-work.txt | Firebase プロジェクト作成、Authentication設定 |
 | 2026-02-24 | manual-work.txt | Firebase Firestore/Storage設定、設定ファイル取得 |
+| 2026-02-24 | manual-work.txt | Apple Developer Program登録、App Store Connect設定 |
+| 2026-02-24 | progress.txt | Phase 0: プロジェクトセットアップ完了 |
+| 2026-02-24 | progress.txt | Phase 1: 基盤実装完了 |
+| 2026-02-25 | progress.txt | Phase 2: メトロノーム機能完了 |
+| 2026-02-25 | progress.txt | Phase 3: タイマー機能完了 |
+| 2026-02-25 | progress.txt | Phase 4: 音源再生機能完了 |
+| 2026-02-25 | progress.txt | Phase 5: 認証・課金完了 |
+| 2026-02-25 | progress.txt | Phase 6: プリセット・クラウド同期完了 |
+| 2026-02-25 | progress.txt | Phase 7: 広告完了 |
+| 2026-02-25 | progress.txt | Phase 8: バックグラウンド再生完了 |

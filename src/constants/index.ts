@@ -9,6 +9,20 @@ export const DEFAULT_BPM = 120;
 export const MAX_TIMER_SECONDS = 24 * 60 * 60; // 24 hours
 export const TIMER_INCREMENT_OPTIONS = [30, 60, 180, 300, 600, 1800] as const;
 
+// Timer preset options for dropdown (in seconds)
+export const TIMER_PRESET_OPTIONS: readonly { value: number; label: string }[] = [
+  { value: 0, label: 'カスタム' },
+  { value: 60, label: '1分' },
+  { value: 180, label: '3分' },
+  { value: 300, label: '5分' },
+  { value: 600, label: '10分' },
+  { value: 900, label: '15分' },
+  { value: 1200, label: '20分' },
+  { value: 1800, label: '30分' },
+  { value: 2700, label: '45分' },
+  { value: 3600, label: '1時間' },
+] as const;
+
 // Time signatures
 export const TIME_SIGNATURES: readonly TimeSignature[] = [
   '2/4',

@@ -1,112 +1,82 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AuthProvider, useAuth, SubscriptionProvider } from './src/contexts';
 import {
   MainLayout,
   MetronomePanel,
   TimerPanel,
   AudioPlayerPanel,
 } from './src/components';
-import type { TimeSignature, AccentPattern, PlaybackSpeed } from './src/types';
+import { useMetronome, useTimer, useAudioPlayer } from './src/hooks';
+import type { TimeSignature, AccentPattern } from './src/types';
 
-export default function App() {
+/**
+ * Main app content (requires AuthContext)
+ */
+function AppContent() {
+  // Auth state
+  const { isPremium } = useAuth();
+
   // Metronome state
   const [bpm, setBpm] = useState(120);
   const [timeSignature, setTimeSignature] = useState<TimeSignature>('4/4');
   const [accentPattern, setAccentPattern] = useState<AccentPattern>('first');
-  const [isMetronomePlaying, setIsMetronomePlaying] = useState(false);
-  const [currentBeat, setCurrentBeat] = useState(0);
 
-  // Timer state
-  const [timerSeconds, setTimerSeconds] = useState(0);
-  const [timerTotal, setTimerTotal] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [isTimerPaused, setIsTimerPaused] = useState(false);
+  // Use metronome hook for Web Audio API
+  const {
+    isPlaying: isMetronomePlaying,
+    currentBeat,
+    toggle: toggleMetronome,
+  } = useMetronome({
+    bpm,
+    timeSignature,
+    accentPattern,
+  });
 
-  // Audio state
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
-  const [audioDuration, setAudioDuration] = useState(0);
-  const [audioFileName, setAudioFileName] = useState<string | undefined>(undefined);
-  const [playbackSpeed, setPlaybackSpeed] = useState<PlaybackSpeed>(1);
-  const [isLooping, setIsLooping] = useState(false);
-  const [loopStart, setLoopStart] = useState<number | null>(null);
-  const [loopEnd, setLoopEnd] = useState<number | null>(null);
+  // Timer hook
+  const timer = useTimer({
+    onComplete: () => {
+      // Timer completed - alarm plays automatically
+    },
+  });
+
+  // Audio player hook
+  const audioPlayer = useAudioPlayer();
+
+  // File input ref for web
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Language state
-  const [language, setLanguage] = useState('JA');
+  const [language] = useState('JA');
 
   // Metronome handlers
   const handleBpmChange = useCallback((newBpm: number) => {
     setBpm(newBpm);
   }, []);
 
-  const handleToggleMetronome = useCallback(() => {
-    setIsMetronomePlaying((prev) => !prev);
-    if (!isMetronomePlaying) {
-      setCurrentBeat(0);
-    }
-  }, [isMetronomePlaying]);
-
-  // Timer handlers
-  const handleAddTime = useCallback((seconds: number) => {
-    setTimerSeconds((prev) => prev + seconds);
-    setTimerTotal((prev) => prev + seconds);
-  }, []);
-
-  const handleTimerStart = useCallback(() => {
-    if (timerSeconds > 0) {
-      setIsTimerRunning(true);
-      setIsTimerPaused(false);
-    }
-  }, [timerSeconds]);
-
-  const handleTimerPause = useCallback(() => {
-    setIsTimerRunning(false);
-    setIsTimerPaused(true);
-  }, []);
-
-  const handleTimerResume = useCallback(() => {
-    setIsTimerRunning(true);
-    setIsTimerPaused(false);
-  }, []);
-
-  const handleTimerReset = useCallback(() => {
-    setIsTimerRunning(false);
-    setIsTimerPaused(false);
-    setTimerSeconds(0);
-    setTimerTotal(0);
-  }, []);
-
-  // Audio handlers
-  const handleAudioPlay = useCallback(() => {
-    setIsAudioPlaying(true);
-  }, []);
-
-  const handleAudioPause = useCallback(() => {
-    setIsAudioPlaying(false);
-  }, []);
-
-  const handleAudioSeek = useCallback((time: number) => {
-    setAudioCurrentTime(time);
-  }, []);
-
+  // File selection handler
   const handleSelectFile = useCallback(() => {
-    // File picker will be implemented later
-    setAudioFileName('sample-track.mp3');
-    setAudioDuration(180); // 3 minutes for demo
+    if (Platform.OS === 'web' && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+    // iOS file picker will be implemented with native module
   }, []);
 
-  const handleSetLoopStart = useCallback(() => {
-    setLoopStart(audioCurrentTime);
-  }, [audioCurrentTime]);
-
-  const handleSetLoopEnd = useCallback(() => {
-    setLoopEnd(audioCurrentTime);
-  }, [audioCurrentTime]);
+  // Handle file input change (Web)
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        audioPlayer.loadFile(file);
+      }
+    },
+    [audioPlayer]
+  );
 
   return (
-    <SafeAreaProvider>
+    <>
       <StatusBar style="light" />
       <MainLayout
         language={language}
@@ -120,46 +90,74 @@ export default function App() {
             onBpmChange={handleBpmChange}
             onTimeSignatureChange={setTimeSignature}
             onAccentPatternChange={setAccentPattern}
-            onTogglePlay={handleToggleMetronome}
+            onTogglePlay={toggleMetronome}
           />
         }
         timerPanel={
           <TimerPanel
-            remainingSeconds={timerSeconds}
-            totalSeconds={timerTotal}
-            isRunning={isTimerRunning}
-            isPaused={isTimerPaused}
-            onAddTime={handleAddTime}
-            onStart={handleTimerStart}
-            onPause={handleTimerPause}
-            onResume={handleTimerResume}
-            onReset={handleTimerReset}
+            remainingSeconds={timer.remainingSeconds}
+            totalSeconds={timer.totalSeconds}
+            isRunning={timer.isRunning}
+            isPaused={timer.isPaused}
+            onAddTime={timer.addTime}
+            onSetTime={timer.setTime}
+            onStart={timer.start}
+            onPause={timer.pause}
+            onResume={timer.resume}
+            onReset={timer.reset}
           />
         }
         audioPanel={
-          <AudioPlayerPanel
-            isPlaying={isAudioPlaying}
-            currentTime={audioCurrentTime}
-            duration={audioDuration}
-            fileName={audioFileName}
-            playbackSpeed={playbackSpeed}
-            isLooping={isLooping}
-            loopStart={loopStart}
-            loopEnd={loopEnd}
-            onPlay={handleAudioPlay}
-            onPause={handleAudioPause}
-            onSeek={handleAudioSeek}
-            onSkipBack={() => handleAudioSeek(Math.max(0, audioCurrentTime - 15))}
-            onSkipForward={() => handleAudioSeek(Math.min(audioDuration, audioCurrentTime + 15))}
-            onSelectFile={handleSelectFile}
-            onSpeedChange={setPlaybackSpeed}
-            onToggleLoop={() => setIsLooping((prev) => !prev)}
-            onSetLoopStart={handleSetLoopStart}
-            onSetLoopEnd={handleSetLoopEnd}
-            isPremium={true} // For demo purposes
-          />
+          <>
+            <AudioPlayerPanel
+              isPlaying={audioPlayer.isPlaying}
+              currentTime={audioPlayer.currentTime}
+              duration={audioPlayer.duration}
+              fileName={audioPlayer.fileName ?? undefined}
+              playbackSpeed={audioPlayer.playbackSpeed}
+              isLooping={audioPlayer.isLooping}
+              loopStart={audioPlayer.loopStart}
+              loopEnd={audioPlayer.loopEnd}
+              onPlay={audioPlayer.play}
+              onPause={audioPlayer.pause}
+              onSeek={audioPlayer.seek}
+              onSkipBack={() => audioPlayer.skipBack(15)}
+              onSkipForward={() => audioPlayer.skipForward(15)}
+              onSelectFile={handleSelectFile}
+              onSpeedChange={audioPlayer.setPlaybackSpeed}
+              onToggleLoop={audioPlayer.toggleLoop}
+              onSetLoopStart={audioPlayer.setLoopStart}
+              onSetLoopEnd={audioPlayer.setLoopEnd}
+              isPremium={isPremium}
+            />
+            {/* Hidden file input for Web */}
+            {Platform.OS === 'web' && (
+              <input
+                ref={fileInputRef as React.RefObject<HTMLInputElement>}
+                type="file"
+                accept="audio/mpeg,audio/wav,audio/x-wav"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+            )}
+          </>
         }
       />
+    </>
+  );
+}
+
+/**
+ * App entry point with providers
+ */
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <AuthProvider>
+        <SubscriptionProvider>
+          <AppContent />
+        </SubscriptionProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }
