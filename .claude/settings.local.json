@@ -11,7 +11,12 @@
       "Bash(npm run web:*)",
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(firebase:*)",
+      "Bash(npx expo:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run test:coverage:*)",
+      "Bash(npm run build:web:*)"
     ]
   }
 }

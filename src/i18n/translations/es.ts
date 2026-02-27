@@ -103,6 +103,11 @@ export const es: TranslationKeys = {
   errors: {
     network: 'Por favor, verifica tu conexión a internet',
     loginFailed: 'Error al iniciar sesión. Por favor, intenta de nuevo',
+    loginCancelled: 'Inicio de sesión cancelado',
+    invalidApiKey: 'Error de configuración del servicio. Contacta al soporte',
+    popupBlocked: 'Ventana emergente bloqueada. Por favor, permite las ventanas emergentes',
+    popupClosed: 'La ventana de inicio de sesión fue cerrada',
+    unknownError: 'Ocurrió un error inesperado',
     paymentFailed: 'Error en el pago. Por favor, verifica tu tarjeta',
     fileReadFailed: 'Error al leer el archivo',
     fileTooLarge: 'Archivo demasiado grande (máx: 20MB)',

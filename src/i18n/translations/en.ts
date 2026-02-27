@@ -103,6 +103,11 @@ export const en: TranslationKeys = {
   errors: {
     network: 'Please check your internet connection',
     loginFailed: 'Login failed. Please try again',
+    loginCancelled: 'Login was cancelled',
+    invalidApiKey: 'Service configuration error. Please contact support',
+    popupBlocked: 'Popup was blocked. Please allow popups',
+    popupClosed: 'Login window was closed',
+    unknownError: 'An unexpected error occurred',
     paymentFailed: 'Payment failed. Please check your card information',
     fileReadFailed: 'Failed to read file',
     fileTooLarge: 'File size too large (max: 20MB)',

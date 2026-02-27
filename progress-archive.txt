@@ -52,6 +52,47 @@
 
 ---
 
+### 2026-02-27 完了
+
+#### manual-work.txt より
+
+**4. Google Cloud Platform OAuth設定**
+
+4.1 OAuth 同意画面
+- [x] OAuth 同意画面の設定
+- [x] アプリ名: MetronomeMegaMax
+- [x] ユーザーサポートメール設定
+- [x] デベロッパー連絡先設定
+- [x] User Type: 外部
+
+4.2 OAuth クライアント ID
+- [x] iOS 用 OAuth クライアント ID の作成
+  - 名前: MetronomeMegaMax iOS
+  - バンドルID: com.yourcompany.metronomemegamax
+  - クライアントID: 974435441915-b6siss7gr20a2mcs54n7g6c73m39bjvr.apps.googleusercontent.com
+- [x] Web 用 OAuth クライアント ID の作成
+  - 名前: MetronomeMegaMax Web
+  - 承認済みJavaScriptオリジン: http://localhost:19006, http://localhost:8081
+  - クライアントID: 974435441915-c93e649pd68q5q6q1ch7ag6jt9egs6be.apps.googleusercontent.com
+
+4.3 APIキー設定
+- [x] Browser key に Identity Toolkit API を許可
+- [x] .env ファイルにクライアントIDを設定
+- [x] Google Sign-In 動作確認完了
+
+**2.3 In-App Purchase 設定**
+
+- [x] サブスクリプショングループの作成（Premium）
+- [x] 月額プラン（200円）の作成
+  - 参照名: Premium Monthly
+  - 製品ID: premium_monthly_200
+  - 期間: 1ヶ月
+- [x] サンドボックステスターの追加（2名）
+  - test@batsugaku.test
+  - akairen0083@gmail.com
+
+---
+
 #### progress.txt より
 
 **Phase 0: プロジェクトセットアップ** ✅ 完了（2026-02-24）
@@ -316,6 +357,48 @@
 
 ---
 
+### 2026-02-27 完了（法務）
+
+#### manual-work.txt より
+
+**7. 法務・コンプライアンス** ✅ 完了（2026-02-27）
+
+7.1 プライバシーポリシー
+- [x] プライバシーポリシーの作成
+  - 収集するデータ: メールアドレス、課金情報、利用データ、音声ファイル
+  - 使用目的: 認証、課金管理、サービス提供、クラウド同期
+  - 第三者提供: Firebase, Stripe, Apple, AdMob/AdSense
+- [x] Webページとして公開
+  - URL: https://metronome-mega-max.web.app/legal/privacy-policy.html
+
+7.2 利用規約
+- [x] 利用規約の作成
+  - サービス内容（メトロノーム、タイマー、音源再生）
+  - 有料プラン（月額200円）
+  - 禁止事項
+  - 免責事項
+  - 知的財産権
+  - 準拠法・管轄裁判所（日本法、東京地方裁判所）
+- [x] Webページとして公開
+  - URL: https://metronome-mega-max.web.app/legal/terms-of-service.html
+
+7.3 特定商取引法に基づく表記
+- [x] 販売事業者名
+- [x] 所在地・連絡先
+- [x] 販売価格（月額200円）
+- [x] 支払方法（iOS: App Store、Web: Stripe）
+- [x] 返品・キャンセルについて
+- [x] 免責事項
+- [x] Webページとして公開
+  - URL: https://metronome-mega-max.web.app/legal/tokutei.html
+
+**作成ファイル:**
+- public/legal/privacy-policy.html
+- public/legal/terms-of-service.html
+- public/legal/tokutei.html
+
+---
+
 ## アーカイブ履歴
 
 | 日付 | 移動元 | タスク概要 |
@@ -332,3 +415,18 @@
 | 2026-02-25 | progress.txt | Phase 6: プリセット・クラウド同期完了 |
 | 2026-02-25 | progress.txt | Phase 7: 広告完了 |
 | 2026-02-25 | progress.txt | Phase 8: バックグラウンド再生完了 |
+| 2026-02-27 | manual-work.txt | GCP OAuth設定完了（Google Sign-In動作確認済み） |
+| 2026-02-27 | manual-work.txt | In-App Purchase設定完了（サブスクリプション・テスター追加） |
+| 2026-02-27 | manual-work.txt | プロビジョニングプロファイル（開発用）完了 |
+| 2026-02-27 | manual-work.txt | AdMob設定完了（バナー広告ユニット作成） |
+| 2026-02-27 | manual-work.txt | Firebase Hosting設定・デプロイ完了 |
+| 2026-02-27 | manual-work.txt | AdSenseサイト登録完了（審査待ち） |
+| 2026-02-27 | manual-work.txt | Phase 6 ドメイン・ホスティング設定完了 |
+| 2026-02-27 | manual-work.txt | セクション7 法務・コンプライアンス完了 |
+| 2026-02-27 | manual-work.txt | セクション8.1 テストアカウント完了 |
+| 2026-02-27 | manual-work.txt | セクション10.2 サポート体制完了 |
+| 2026-02-27 | manual-work.txt | セクション8.2 テスト環境分離（不要と判断）完了 |
+| 2026-02-27 | manual-work.txt | セクション10.1 Google Search Console設定完了 |
+| 2026-02-27 | manual-work.txt | セクション10.1 Firebase Analytics確認（有効化済み）完了 |
+| 2026-02-27 | manual-work.txt | セクション10.1 Firebase Crashlytics スキップ |
+| 2026-02-27 | manual-work.txt | セクション10 リリース後設定 完了 |

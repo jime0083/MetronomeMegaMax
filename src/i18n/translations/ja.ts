@@ -84,6 +84,11 @@ export interface TranslationKeys {
   errors: {
     network: string;
     loginFailed: string;
+    loginCancelled: string;
+    invalidApiKey: string;
+    popupBlocked: string;
+    popupClosed: string;
+    unknownError: string;
     paymentFailed: string;
     fileReadFailed: string;
     fileTooLarge: string;
@@ -200,6 +205,11 @@ export const ja: TranslationKeys = {
   errors: {
     network: 'インターネット接続を確認してください',
     loginFailed: 'ログインに失敗しました。再度お試しください',
+    loginCancelled: 'ログインがキャンセルされました',
+    invalidApiKey: 'サービス設定エラーが発生しました。管理者にお問い合わせください',
+    popupBlocked: 'ポップアップがブロックされました。ポップアップを許可してください',
+    popupClosed: 'ログイン画面が閉じられました',
+    unknownError: '予期しないエラーが発生しました',
     paymentFailed: '決済に失敗しました。カード情報をご確認ください',
     fileReadFailed: 'ファイルを読み込めませんでした',
     fileTooLarge: 'ファイルサイズが大きすぎます（上限: 20MB）',

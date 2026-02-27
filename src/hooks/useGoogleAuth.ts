@@ -21,14 +21,52 @@ import {
 // Enable web browser redirect for OAuth
 WebBrowser.maybeCompleteAuthSession();
 
+/** Error key type for localization */
+export type AuthErrorKey =
+  | 'loginFailed'
+  | 'loginCancelled'
+  | 'invalidApiKey'
+  | 'popupBlocked'
+  | 'popupClosed'
+  | 'unknownError';
+
 interface UseGoogleAuthResult {
   /** Sign in with Google */
   signIn: () => Promise<void>;
   /** Whether sign-in is in progress */
   isLoading: boolean;
-  /** Error message if sign-in failed */
-  error: string | null;
+  /** Error key for localization (use with t('errors.{errorKey}')) */
+  errorKey: AuthErrorKey | null;
 }
+
+/**
+ * Map Firebase error codes to localization keys
+ */
+const mapErrorToKey = (error: unknown): AuthErrorKey => {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+
+    // API key errors
+    if (message.includes('api-key-not-valid') || message.includes('invalid-api-key')) {
+      return 'invalidApiKey';
+    }
+
+    // Popup errors
+    if (message.includes('popup-blocked')) {
+      return 'popupBlocked';
+    }
+    if (message.includes('popup-closed') || message.includes('cancelled-popup-request')) {
+      return 'popupClosed';
+    }
+
+    // Cancellation
+    if (message.includes('cancel')) {
+      return 'loginCancelled';
+    }
+  }
+
+  return 'loginFailed';
+};
 
 /**
  * Hook for Google Authentication
@@ -36,7 +74,7 @@ interface UseGoogleAuthResult {
  */
 export const useGoogleAuth = (): UseGoogleAuthResult => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorKey, setErrorKey] = useState<AuthErrorKey | null>(null);
 
   const clientIds = getGoogleClientIds();
 
@@ -84,7 +122,7 @@ export const useGoogleAuth = (): UseGoogleAuthResult => {
    */
   const signIn = useCallback(async (): Promise<void> => {
     setIsLoading(true);
-    setError(null);
+    setErrorKey(null);
 
     try {
       if (Platform.OS === 'web') {
@@ -93,9 +131,8 @@ export const useGoogleAuth = (): UseGoogleAuthResult => {
         await signInIOS();
       }
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(message);
+      const key = mapErrorToKey(err);
+      setErrorKey(key);
       throw err;
     } finally {
       setIsLoading(false);
@@ -105,6 +142,6 @@ export const useGoogleAuth = (): UseGoogleAuthResult => {
   return {
     signIn,
     isLoading,
-    error,
+    errorKey,
   };
 };

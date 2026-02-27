@@ -14,6 +14,7 @@ import {
   Animated,
 } from 'react-native';
 import { useGoogleAuth } from '../../hooks/useGoogleAuth';
+import { useTranslation } from '../../hooks/useTranslation';
 import {
   colors,
   typography,
@@ -42,7 +43,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onClose,
   onLoginSuccess,
 }) => {
-  const { signIn, isLoading, error } = useGoogleAuth();
+  const { signIn, isLoading, errorKey } = useGoogleAuth();
+  const { t } = useTranslation();
 
   // Animation values
   const backdropOpacity = useRef(new Animated.Value(0)).current;
@@ -220,9 +222,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </Pressable>
 
               {/* Error message */}
-              {error && (
+              {errorKey && (
                 <View style={styles.errorContainer}>
-                  <Text style={styles.errorText}>{error}</Text>
+                  <Text style={styles.errorText}>{t(`errors.${errorKey}`)}</Text>
                 </View>
               )}
 
