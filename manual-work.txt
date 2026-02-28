@@ -35,34 +35,28 @@ iOS リリースに必須
 
 ---
 
-## セクション3: Stripe 設定 [P1] ⏳ 保留中（2026-02-28以降に実施予定）
+## セクション3: Stripe 設定 [P1] ⏳ 一部完了（本人確認書類待ち）
 Web版の課金に必須
-※2段階認証の設定待ち
 
-### 3.1 Stripe アカウント
-- [~] Stripe アカウントの作成（2段階認証待ち）
-- [ ] 本番モードの有効化（本人確認等）
-- [ ] APIキーの取得（テスト用 / 本番用）
+### 3.1 Stripe アカウント ✅ 完了（2026-02-27）
+- [x] Stripe アカウントの作成
+- [x] 本番モードの有効化
+- [x] APIキーの取得（本番用）
+  - 公開可能キー: pk_live_51T5Px2E1almCgSXL...
+  - シークレットキー: .envに保存済み
 
-### 3.2 Stripe 商品設定
-- [ ] 商品の作成: MetronomeMegaMax Premium
-- [ ] 価格の作成: ¥200/月（recurring）
-- [ ] 価格ID の記録
+### 3.2 Stripe 商品設定 ✅ 完了（2026-02-27）
+- [x] 商品の作成: MetronomeMegaMax Premium
+  - 商品ID: prod_U3XavnxTvNmqks
+- [x] 価格の作成: ¥200/月（recurring）
+- [x] 価格ID: price_1T5QVYE1almCgSXLZr51zoU6
 
-### 3.3 Stripe Webhook 設定
-- [ ] Webhook エンドポイントの設定
-- [ ] 以下のイベントを購読:
-  - customer.subscription.created
-  - customer.subscription.updated
-  - customer.subscription.deleted
-  - invoice.payment_succeeded
-  - invoice.payment_failed
-- [ ] Webhook Secret の取得
+### 3.3 Stripe Payment Link [!] ブロック中（本人確認書類待ち）
+※Webhookの代わりにPayment Linksを使用（バックエンド不要）
+- [ ] Payment Linkの作成 → 本人確認完了後
 
 ### 3.4 Stripe Customer Portal
-- [ ] Customer Portal の有効化
-- [ ] ブランディング設定（ロゴ、色）
-- [ ] 解約フローの設定
+- [ ] Customer Portal の有効化 → Payment Link作成後
 
 ---
 
@@ -160,11 +154,11 @@ Web版の課金に必須
 ## 現在のステータス
 
 **最終更新:** 2026-02-27
-**完了:** セクション1, 2.1-2.3, 4, 5.1, 6, 7, 8, 10
+**完了:** セクション1, 2.1-2.3, 3.1-3.2, 4, 5.1, 6, 7, 8, 10
 **公開URL:** https://metronome-mega-max.web.app
 
 **次のアクション（優先順）:**
-1. [P1] セクション3: Stripe 設定 → 2/28以降実施
+1. [P1] セクション3.3: Stripe Payment Link作成 → 本人確認書類提出後
 2. [P2] セクション5.2: AdSense広告ユニット作成 → 審査完了後
 3. [P1] セクション2.4: 配布用プロビジョニングプロファイル → App Store申請時
 

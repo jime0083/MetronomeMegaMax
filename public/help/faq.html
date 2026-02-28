@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>よくある質問（FAQ）- MetronomeMegaMax</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.8;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      color: #333;
+      background-color: #fafafa;
+    }
+    h1 {
+      color: #1a1a2e;
+      border-bottom: 3px solid #ff6b35;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #1a1a2e;
+      margin-top: 40px;
+      border-left: 4px solid #ff6b35;
+      padding-left: 12px;
+    }
+    .nav-links {
+      margin-bottom: 30px;
+    }
+    .nav-links a {
+      margin-right: 20px;
+      text-decoration: none;
+      color: #ff6b35;
+    }
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+    .faq-item {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .faq-question {
+      font-weight: bold;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    .faq-question::before {
+      content: "Q. ";
+      color: #ff6b35;
+    }
+    .faq-answer {
+      color: #555;
+    }
+    .faq-answer::before {
+      content: "A. ";
+      color: #2196f3;
+      font-weight: bold;
+    }
+    a {
+      color: #ff6b35;
+    }
+    ul {
+      padding-left: 24px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-links">
+    <a href="/help/">ヘルプ</a>
+    <a href="/help/faq.html">よくある質問</a>
+    <a href="/">アプリに戻る</a>
+  </div>
+
+  <h1>よくある質問（FAQ）</h1>
+
+  <h2>基本的な使い方</h2>
+
+  <div class="faq-item">
+    <div class="faq-question">アカウントを作成しないと使えませんか？</div>
+    <div class="faq-answer">いいえ、アカウントなしでも基本機能（メトロノーム、タイマー、オーディオ再生）は無料でご利用いただけます。アカウントを作成すると、設定やプリセットをクラウドに保存して複数のデバイスで同期できるようになります。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">対応しているブラウザは何ですか？</div>
+    <div class="faq-answer">Chrome、Safari、Firefox、Microsoft Edgeの最新版に対応しています。最高のパフォーマンスを得るには、Chromeをお勧めします。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">スマートフォンでも使えますか？</div>
+    <div class="faq-answer">はい、Web版はスマートフォンのブラウザでもご利用いただけます。また、iOS向けのネイティブアプリも提供しています。</div>
+  </div>
+
+  <h2>メトロノーム</h2>
+
+  <div class="faq-item">
+    <div class="faq-question">メトロノームの精度はどのくらいですか？</div>
+    <div class="faq-answer">当アプリは±1ミリ秒以内の高精度を実現しています。Web Audio APIのスケジューリング機能を使用し、プロフェッショナルな音楽練習に適した精度を提供します。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">BPMの範囲はどこまでですか？</div>
+    <div class="faq-answer">20〜300 BPMの範囲で設定できます。ほとんどの音楽ジャンルをカバーしています。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">対応している拍子は何ですか？</div>
+    <div class="faq-answer">2/4、3/4、4/4、5/4、6/4、7/4、3/8、6/8、9/8、12/8に対応しています。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">ブラウザのタブを切り替えると音が途切れます</div>
+    <div class="faq-answer">ブラウザのバックグラウンドタブでは、省電力のためオーディオ処理が制限される場合があります。メトロノームを使用中は、そのタブをアクティブな状態に保つことをお勧めします。iOS版では有料プランでバックグラウンド再生に対応しています。</div>
+  </div>
+
+  <h2>オーディオプレーヤー</h2>
+
+  <div class="faq-item">
+    <div class="faq-question">どのファイル形式に対応していますか？</div>
+    <div class="faq-answer">MP3とWAV形式に対応しています。ファイルサイズは20MBまでです。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">アップロードした音声ファイルはどこに保存されますか？</div>
+    <div class="faq-answer">ログイン済みの場合、ファイルはFirebase Storageに安全に保存され、お使いのアカウントからのみアクセスできます。ログインしていない場合は、ブラウザのセッション中のみ利用可能です。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">A-Bリピートの使い方を教えてください</div>
+    <div class="faq-answer">有料プランの機能です。再生中に「A」ボタンでループ開始点を、「B」ボタンでループ終了点を設定します。設定後、A-B区間が自動的に繰り返し再生されます。リセットするには「A」ボタンを長押しします。</div>
+  </div>
+
+  <h2>有料プラン・課金</h2>
+
+  <div class="faq-item">
+    <div class="faq-question">有料プランの料金はいくらですか？</div>
+    <div class="faq-answer">月額200円（税込）です。いつでもキャンセルでき、次回の請求日までご利用いただけます。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">有料プランで使える機能は何ですか？</div>
+    <div class="faq-answer">
+      <ul>
+        <li>BPMプリセット保存（10個まで）</li>
+        <li>タイマープリセット保存（10個まで）</li>
+        <li>A-Bリピート機能</li>
+        <li>ループポイント保存（3個まで）</li>
+        <li>再生速度変更（0.5〜2倍）</li>
+        <li>バックグラウンド再生（iOS）</li>
+        <li>広告非表示</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">支払い方法は何がありますか？</div>
+    <div class="faq-answer">Web版ではStripeを通じたクレジットカード払い、iOS版ではApp Storeのアプリ内課金でお支払いいただけます。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">解約方法を教えてください</div>
+    <div class="faq-answer">Web版：アプリ内の「設定」→「サブスクリプション」から解約できます。iOS版：iPhoneの「設定」アプリ→「Apple ID」→「サブスクリプション」からMetronomeMegaMaxを選択して解約してください。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">返金はできますか？</div>
+    <div class="faq-answer">Web版：契約後7日以内であれば返金いたします。お問い合わせフォームよりご連絡ください。iOS版：Appleの返金ポリシーに従います。Appleサポートにお問い合わせください。</div>
+  </div>
+
+  <h2>アカウント</h2>
+
+  <div class="faq-item">
+    <div class="faq-question">アカウントを削除したいです</div>
+    <div class="faq-answer">アプリ内の「設定」→「アカウント」→「アカウント削除」から削除できます。削除すると、保存されたプリセットやアップロードしたファイルもすべて削除されます。この操作は取り消せません。</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">複数のデバイスで使えますか？</div>
+    <div class="faq-answer">はい、同じGoogleアカウントでログインすることで、複数のデバイスで設定やプリセットを同期できます。</div>
+  </div>
+
+  <h2>トラブルシューティング</h2>
+
+  <div class="faq-item">
+    <div class="faq-question">音が出ません</div>
+    <div class="faq-answer">以下をご確認ください：
+      <ul>
+        <li>デバイスの音量がミュートになっていないか</li>
+        <li>ブラウザのタブがミュートになっていないか</li>
+        <li>ブラウザのオーディオ権限が許可されているか</li>
+        <li>一度ページをリロードしてみてください</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">ログインできません</div>
+    <div class="faq-answer">以下をお試しください：
+      <ul>
+        <li>ブラウザのCookieとキャッシュをクリアする</li>
+        <li>別のブラウザで試す</li>
+        <li>Googleアカウントのパスワードを確認する</li>
+        <li>ブラウザのポップアップブロックを解除する</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">その他の問題</div>
+    <div class="faq-answer">解決しない場合は、<a href="mailto:akito14140099@gmail.com">akito14140099@gmail.com</a>までお問い合わせください。</div>
+  </div>
+
+  <hr style="margin-top: 40px;">
+  <p style="text-align: center; color: #666; font-size: 14px;">
+    &copy; 2026 MetronomeMegaMax. All rights reserved.
+  </p>
+</body>
+</html>

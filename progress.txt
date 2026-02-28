@@ -43,30 +43,11 @@
 
 ---
 
-## Phase 9: テスト
-目標: 品質保証
+## Phase 9: テスト ✅ 完了（9.1-9.3）
+→ 詳細は progress-archive.txt を参照
+**結果: 114テスト成功、utils 99%カバレッジ、メトロノーム精度±1ms以内達成**
 
-### 9.1 ユニットテスト ✅ 完了 (2026-02-27)
-- [x] メトロノームロジックのテスト（calculateBeatInterval, parseTimeSignature等）
-- [x] タイマーロジックのテスト（formatTime, parseTime, clampSeconds等）
-- [x] バリデーションロジックのテスト（isValidBpm, isValidEmail等）
-- [x] レスポンシブユーティリティのテスト（getLayoutMode等）
-**結果: 115テスト全て成功、utils 99%カバレッジ達成**
-
-### 9.2 E2Eテスト ✅ 完了 (2026-02-27)
-- [x] Playwright設定作成
-- [x] メトロノーム操作フローのテスト
-- [x] タイマー操作フローのテスト
-- [x] アプリ基本動作テスト
-
-### 9.3 パフォーマンステスト ✅ 完了 (2026-02-27)
-- [x] メトロノーム精度測定（±1ms以内達成）
-  - 60/120/300 BPMでの精度テスト
-  - 1時間連続動作時のドリフトテスト
-  - Look-aheadスケジューリングパターンテスト
-**結果: 全BPM範囲で±1ms以内を確認**
-
-### 9.4 クロスプラットフォームテスト
+### 9.4 クロスプラットフォームテスト（未完了）
 - [!] iOS実機テスト（実機なし - 後日実施）
 - [ ] Web（Chrome）テスト
 - [ ] Web（Safari）テスト
@@ -92,25 +73,27 @@
   - URL: https://metronome-mega-max.web.app
 - [x] Google Search Console 登録（2026-02-27）
 
-### 10.3 ドキュメント ✅ 完了 (2026-02-27)
-- [x] ユーザー向けヘルプページの作成
-  - URL: https://metronome-mega-max.web.app/help/
-- [x] FAQ の作成
-  - URL: https://metronome-mega-max.web.app/help/faq.html
+### 10.3 ドキュメント ✅ 完了
+→ 詳細は progress-archive.txt を参照
+- ヘルプ: https://metronome-mega-max.web.app/help/
+- FAQ: https://metronome-mega-max.web.app/help/faq.html
 
 ---
 
 ## 現在のステータス
 
-**現在のフェーズ:** Phase 9: テスト → Phase 10: リリース準備
+**現在のフェーズ:** Phase 10: リリース準備（残り10.1, 10.2一部）
 **最終更新:** 2026-02-27
-**完了済み:** Phase 0-8（コード実装）、法務ドキュメント（7.1-7.3）
+**完了済み:** Phase 0-8（コード実装）、Phase 9（テスト）、法務ドキュメント（7.1-7.3）、ヘルプ・FAQ
 
 **手動作業ブロッカー:**
-- [P1] manual-work.txt 3: Stripe 設定（Web課金に必要） → 2/28以降実施
-- [P2] manual-work.txt 5.2: AdSense広告ユニット作成 → 審査完了後
+- [P1] manual-work.txt セクション3: Stripe 設定（Web課金に必要） → 2/28以降実施
+- [P2] manual-work.txt セクション5.2: AdSense広告ユニット作成 → 審査完了後
 
-**法務ドキュメントURL:**
+**公開済みURL:**
+- アプリ: https://metronome-mega-max.web.app
+- ヘルプ: https://metronome-mega-max.web.app/help/
+- FAQ: https://metronome-mega-max.web.app/help/faq.html
 - プライバシーポリシー: https://metronome-mega-max.web.app/legal/privacy-policy.html
 - 利用規約: https://metronome-mega-max.web.app/legal/terms-of-service.html
 - 特定商取引法に基づく表記: https://metronome-mega-max.web.app/legal/tokutei.html

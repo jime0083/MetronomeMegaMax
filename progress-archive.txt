@@ -399,6 +399,97 @@
 
 ---
 
+### 2026-02-27 完了（テスト・ドキュメント）
+
+#### progress.txt より
+
+**Phase 9: テスト** ✅ 完了（2026-02-27）
+
+9.1 ユニットテスト
+- [x] メトロノームロジックのテスト（calculateBeatInterval, parseTimeSignature等）
+- [x] タイマーロジックのテスト（formatTime, parseTime, clampSeconds等）
+- [x] バリデーションロジックのテスト（isValidBpm, isValidEmail等）
+- [x] レスポンシブユーティリティのテスト（getLayoutMode等）
+- **結果: 114テスト全て成功、utils 99%カバレッジ達成**
+
+9.2 E2Eテスト
+- [x] Playwright設定作成
+- [x] メトロノーム操作フローのテスト
+- [x] タイマー操作フローのテスト
+- [x] アプリ基本動作テスト
+
+9.3 パフォーマンステスト
+- [x] メトロノーム精度測定（±1ms以内達成）
+  - 60/120/300 BPMでの精度テスト
+  - 1時間連続動作時のドリフトテスト
+  - Look-aheadスケジューリングパターンテスト
+- **結果: 全BPM範囲で±1ms以内を確認**
+
+**作成ファイル:**
+- jest.config.js（Jest設定 - projectsでunit/integrationを分離）
+- jest.setup.js（モック設定）
+- playwright.config.ts（Playwright E2E設定）
+- src/utils/metronomeUtils.ts（BPM計算等のピュア関数）
+- src/utils/timerUtils.ts（時間フォーマット等のピュア関数）
+- src/utils/responsiveUtils.ts（レイアウトモード判定）
+- src/utils/validationUtils.ts（入力検証関数）
+- __tests__/unit/utils/metronomeUtils.test.ts
+- __tests__/unit/utils/timerUtils.test.ts
+- __tests__/unit/utils/responsiveUtils.test.ts
+- __tests__/unit/utils/validationUtils.test.ts
+- __tests__/unit/performance/metronomeAccuracy.test.ts
+- __tests__/e2e/app.spec.ts
+- __tests__/e2e/metronome.spec.ts
+- __tests__/e2e/timer.spec.ts
+
+---
+
+**Phase 10.3: ドキュメント** ✅ 完了（2026-02-27）
+
+- [x] ユーザー向けヘルプページの作成
+  - URL: https://metronome-mega-max.web.app/help/
+  - メトロノーム、タイマー、オーディオプレーヤーの使い方
+  - 有料プラン機能の説明
+  - アカウントと課金の説明
+- [x] FAQ の作成
+  - URL: https://metronome-mega-max.web.app/help/faq.html
+  - 基本的な使い方に関する質問
+  - メトロノームの精度について
+  - 有料プラン・課金について
+  - トラブルシューティング
+
+**作成ファイル:**
+- public/help/index.html（ヘルプページ）
+- public/help/faq.html（FAQ）
+
+---
+
+### 2026-02-27 完了（Stripe設定）
+
+#### manual-work.txt より
+
+**セクション3: Stripe設定** 一部完了（2026-02-27）
+
+3.1 Stripeアカウント ✅ 完了
+- [x] Stripeアカウントの作成
+- [x] 本番モードの有効化
+- [x] APIキーの取得（本番用）
+  - 公開可能キー・シークレットキーを.envに保存
+
+3.2 Stripe商品設定 ✅ 完了
+- [x] 商品の作成: MetronomeMegaMax Premium
+  - 商品ID: prod_U3XavnxTvNmqks
+- [x] 価格の作成: ¥200/月（recurring）
+  - 価格ID: price_1T5QVYE1almCgSXLZr51zoU6
+
+3.3 Stripe Payment Link [!] ブロック中
+- [ ] 本人確認書類の提出待ち
+
+**更新ファイル:**
+- .env（STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, STRIPE_PRICE_ID追加）
+
+---
+
 ## アーカイブ履歴
 
 | 日付 | 移動元 | タスク概要 |
@@ -430,3 +521,9 @@
 | 2026-02-27 | manual-work.txt | セクション10.1 Firebase Analytics確認（有効化済み）完了 |
 | 2026-02-27 | manual-work.txt | セクション10.1 Firebase Crashlytics スキップ |
 | 2026-02-27 | manual-work.txt | セクション10 リリース後設定 完了 |
+| 2026-02-27 | progress.txt | Phase 9.1 ユニットテスト完了（114テスト成功） |
+| 2026-02-27 | progress.txt | Phase 9.2 E2Eテスト作成完了 |
+| 2026-02-27 | progress.txt | Phase 9.3 パフォーマンステスト完了 |
+| 2026-02-27 | progress.txt | Phase 10.3 ヘルプページ・FAQ公開完了 |
+| 2026-02-27 | manual-work.txt | セクション3.1 Stripeアカウント・本番モード有効化完了 |
+| 2026-02-27 | manual-work.txt | セクション3.2 Stripe商品・価格設定完了 |
