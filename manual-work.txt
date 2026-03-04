@@ -80,9 +80,15 @@ Web版の課金に必須
 ### 5.2 Google AdSense（Web）⏳ 審査待ち
 - [x] AdSense アカウントの作成
 - [x] サイトの追加（metronome-mega-max.web.app）（2026-02-27）
+- [x] AdSenseコードを全ページのheadタグに追加（2026-02-27）
+  - dist/index.html（メインアプリ）
+  - public/help/index.html（ヘルプ）
+  - public/help/faq.html（FAQ）
+  - public/legal/privacy-policy.html
+  - public/legal/terms-of-service.html
+  - public/legal/tokutei.html
 - [ ] 審査完了待ち（数日〜2週間）
 - [ ] 広告ユニットの作成 → 審査完了後
-- [ ] 広告コードの取得 → 審査完了後
 
 ---
 
