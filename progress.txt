@@ -70,7 +70,9 @@
 - [x] ホスティング設定（Firebase Hosting）（2026-02-27）
 - [x] SSL証明書の設定（Firebase Hosting 自動）（2026-02-27）
 - [x] 本番環境へのデプロイ（2026-02-27）
-  - URL: https://metronome-mega-max.web.app
+- [x] ランディングページの作成（2026-03-07）
+  - AdSense審査対策として静的コンテンツページを追加
+  - サイト構成変更: ランディングページをルート、アプリを/app/に移動
 - [x] Google Search Console 登録（2026-02-27）
 
 ### 10.3 ドキュメント ✅ 完了
@@ -91,7 +93,8 @@
 - [P2] manual-work.txt セクション5.2: AdSense広告ユニット作成 → 審査完了後
 
 **公開済みURL:**
-- アプリ: https://metronome-mega-max.web.app
+- ランディングページ: https://metronome-mega-max.web.app
+- アプリ: https://metronome-mega-max.web.app/app/
 - ヘルプ: https://metronome-mega-max.web.app/help/
 - FAQ: https://metronome-mega-max.web.app/help/faq.html
 - プライバシーポリシー: https://metronome-mega-max.web.app/legal/privacy-policy.html

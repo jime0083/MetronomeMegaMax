@@ -77,25 +77,35 @@ Web版の課金に必須
   - 広告ユニットID: ca-app-pub-2574956124078440/2796992911
 - [ ] app-ads.txt の設定 → Web公開時に実施
 
-### 5.2 Google AdSense（Web）⏳ 審査待ち
+### 5.2 Google AdSense（Web）⏳ 再審査待ち
 - [x] AdSense アカウントの作成
 - [x] サイトの追加（metronome-mega-max.web.app）（2026-02-27）
 - [x] AdSenseコードを全ページのheadタグに追加（2026-02-27）
-  - dist/index.html（メインアプリ）
-  - public/help/index.html（ヘルプ）
-  - public/help/faq.html（FAQ）
-  - public/legal/privacy-policy.html
-  - public/legal/terms-of-service.html
-  - public/legal/tokutei.html
+- [!] 初回審査不合格（2026-03-07）
+  - 理由: 「パブリッシャーのコンテンツを含まない画面」（SPAでコンテンツ不足）
+- [x] ランディングページ作成（2026-03-07）
+  - public/landing/index.htmlを作成
+  - 機能紹介、使い方、料金、FAQなど豊富なコンテンツを追加
+  - サイト構成変更: ランディングページをルート、アプリを/app/に移動
+- [x] AdSenseコード追加（全ページ更新済み）（2026-03-07）
+  - dist/index.html（ランディングページ）
+  - dist/app/index.html（アプリ）
+  - public/help/index.html
+  - public/help/faq.html
+  - public/legal/*.html
+- [ ] 再審査リクエスト → 手動で実施
 - [ ] 審査完了待ち（数日〜2週間）
 - [ ] 広告ユニットの作成 → 審査完了後
 
 ---
 
-## セクション6: ドメイン・ホスティング設定 [P2] ✅ 完了（2026-02-27）
+## セクション6: ドメイン・ホスティング設定 [P2] ✅ 完了（2026-02-27、更新2026-03-07）
 → 詳細は progress-archive.txt を参照
 ※カスタムドメインは不要のため、Firebase Hostingのデフォルトドメインを使用
-公開URL: https://metronome-mega-max.web.app
+
+**公開URL:**
+- ランディングページ: https://metronome-mega-max.web.app
+- アプリ: https://metronome-mega-max.web.app/app/
 
 ---
 
