@@ -1,11 +1,9 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Animated,
-  Easing,
   Platform,
 } from 'react-native';
 import { Panel } from '@/components/layout/Panel';
@@ -49,20 +47,6 @@ interface MetronomePanelProps {
   isPremium?: boolean;
 }
 
-// Get tempo name from BPM
-const getTempoName = (bpm: number): string => {
-  if (bpm < 40) return 'Grave';
-  if (bpm < 60) return 'Largo';
-  if (bpm < 66) return 'Larghetto';
-  if (bpm < 76) return 'Adagio';
-  if (bpm < 108) return 'Andante';
-  if (bpm < 120) return 'Moderato';
-  if (bpm < 156) return 'Allegro';
-  if (bpm < 176) return 'Vivace';
-  if (bpm < 200) return 'Presto';
-  return 'Prestissimo';
-};
-
 export const MetronomePanel: React.FC<MetronomePanelProps> = ({
   bpm,
   timeSignature,
@@ -76,49 +60,8 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
   onSavePreset,
   isPremium = false,
 }) => {
-  const pendulumAnim = useRef(new Animated.Value(0)).current;
-
   // Parse time signature to get beats per measure
   const beatsPerMeasure = parseInt(timeSignature.split('/')[0], 10);
-
-  // Vertical pendulum animation - swings left and right
-  useEffect(() => {
-    if (isPlaying) {
-      const duration = (60 / bpm) * 1000; // One beat duration in ms
-
-      const animation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(pendulumAnim, {
-            toValue: 1,
-            duration: duration / 2,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(pendulumAnim, {
-            toValue: -1,
-            duration: duration,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(pendulumAnim, {
-            toValue: 0,
-            duration: duration / 2,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-        ])
-      );
-
-      animation.start();
-      return () => animation.stop();
-    } else {
-      Animated.timing(pendulumAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [isPlaying, bpm, pendulumAnim]);
 
   const handleBpmIncrement = useCallback(() => {
     if (bpm < MAX_BPM) onBpmChange(bpm + 1);
@@ -127,12 +70,6 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
   const handleBpmDecrement = useCallback(() => {
     if (bpm > MIN_BPM) onBpmChange(bpm - 1);
   }, [bpm, onBpmChange]);
-
-  // Pendulum rotation (swinging from top pivot point)
-  const pendulumRotation = pendulumAnim.interpolate({
-    inputRange: [-1, 0, 1],
-    outputRange: ['-25deg', '0deg', '25deg'],
-  });
 
   const isAccentBeat = (beat: number): boolean => {
     if (accentPattern === 'first') return beat === 0;
@@ -143,28 +80,19 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
 
   return (
     <Panel title="METRONOME">
-      {/* Tempo Name */}
-      <Text style={styles.tempoName}>{getTempoName(bpm)}</Text>
-
-      {/* Vertical Pendulum Container */}
-      <View style={styles.pendulumContainer}>
-        {/* Pendulum arm with pivot at top */}
-        <Animated.View
-          style={[
-            styles.pendulumArm,
-            {
-              transform: [{ rotate: pendulumRotation }],
-            },
-          ]}
-        >
-          {/* Pendulum rod (orange) */}
-          <View style={styles.pendulumRod} />
-          {/* Pendulum weight (white circle) */}
-          <View style={styles.pendulumWeight} />
-        </Animated.View>
-
-        {/* Pivot point at top */}
-        <View style={styles.pendulumPivot} />
+      {/* Beat Indicators - Above BPM display */}
+      <View style={styles.beatIndicators}>
+        {Array.from({ length: beatsPerMeasure }).map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.beatDot,
+              currentBeat === index && isPlaying && styles.beatDotActive,
+              isAccentBeat(index) && styles.beatDotAccent,
+              currentBeat === index && isPlaying && isAccentBeat(index) && styles.beatDotAccentActive,
+            ]}
+          />
+        ))}
       </View>
 
       {/* BPM Display */}
@@ -191,21 +119,6 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
         >
           <Text style={styles.bpmButtonText}>+</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Beat Indicators */}
-      <View style={styles.beatIndicators}>
-        {Array.from({ length: beatsPerMeasure }).map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.beatDot,
-              currentBeat === index && isPlaying && styles.beatDotActive,
-              isAccentBeat(index) && styles.beatDotAccent,
-              currentBeat === index && isPlaying && isAccentBeat(index) && styles.beatDotAccentActive,
-            ]}
-          />
-        ))}
       </View>
 
       {/* Selectors Row */}
@@ -254,53 +167,33 @@ export const MetronomePanel: React.FC<MetronomePanelProps> = ({
 };
 
 const styles = StyleSheet.create({
-  // Tempo Name
-  tempoName: {
-    color: colors.text.secondary,
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.medium,
-    marginBottom: spacing[2],
-    letterSpacing: 1,
+  // Beat Indicators - 30% larger (16 * 1.3 = ~21)
+  beatIndicators: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing[3],
+    marginTop: spacing[2],
+    marginBottom: spacing[6],
   },
-
-  // Pendulum
-  pendulumContainer: {
-    height: 160,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    marginBottom: spacing[4],
-    position: 'relative',
+  beatDot: {
+    width: 21,
+    height: 21,
+    borderRadius: 11,
+    backgroundColor: colors.beat.inactive,
+    borderWidth: 2,
+    borderColor: colors.border.secondary,
   },
-  pendulumPivot: {
-    position: 'absolute',
-    top: 0,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: colors.border.primary,
-    zIndex: 10,
+  beatDotActive: {
+    backgroundColor: colors.beat.active,
+    borderColor: colors.accent[600],
   },
-  pendulumArm: {
-    position: 'absolute',
-    top: 6,
-    alignItems: 'center',
-    transformOrigin: 'top center',
+  beatDotAccent: {
+    borderColor: colors.accent[500],
+    borderWidth: 2,
   },
-  pendulumRod: {
-    width: 6,
-    height: 110,
-    backgroundColor: colors.accent[500],
-    borderRadius: 3,
-  },
-  pendulumWeight: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.surface.primary,
-    marginTop: -4,
-    borderWidth: 3,
-    borderColor: colors.border.primary,
+  beatDotAccentActive: {
+    backgroundColor: colors.beat.accent,
+    borderColor: colors.beat.accent,
   },
 
   // BPM Controls
@@ -309,7 +202,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing[6],
-    marginBottom: spacing[4],
+    marginBottom: spacing[6],
   },
   bpmButton: {
     width: 48,
@@ -348,34 +241,6 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.medium,
     marginTop: spacing[1],
-  },
-
-  // Beat Indicators
-  beatIndicators: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing[3],
-    marginBottom: spacing[4],
-  },
-  beatDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: colors.beat.inactive,
-    borderWidth: 2,
-    borderColor: colors.border.secondary,
-  },
-  beatDotActive: {
-    backgroundColor: colors.beat.active,
-    borderColor: colors.accent[600],
-  },
-  beatDotAccent: {
-    borderColor: colors.accent[500],
-    borderWidth: 2,
-  },
-  beatDotAccentActive: {
-    backgroundColor: colors.beat.accent,
-    borderColor: colors.beat.accent,
   },
 
   // Selectors

@@ -7,9 +7,8 @@ import {
   Platform,
 } from 'react-native';
 import { Panel } from '@/components/layout/Panel';
-import { DropdownSelector } from '@/components/common/DropdownSelector';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
-import { TIMER_INCREMENT_OPTIONS, MAX_TIMER_SECONDS, TIMER_PRESET_OPTIONS } from '@/constants';
+import { TIMER_INCREMENT_OPTIONS, MAX_TIMER_SECONDS } from '@/constants';
 
 interface TimerPanelProps {
   remainingSeconds: number;
@@ -91,27 +90,6 @@ export const TimerPanel: React.FC<TimerPanelProps> = ({
 
   const isAlmostDone = remainingSeconds <= 10 && remainingSeconds > 0 && isRunning;
 
-  // Format preset options for dropdown display
-  const presetDropdownOptions = useMemo(() =>
-    TIMER_PRESET_OPTIONS.map(opt => ({
-      value: opt.value,
-      label: opt.label,
-    })),
-    []
-  );
-
-  // Find current preset value (or 0 for custom)
-  const currentPresetValue = useMemo(() => {
-    const matchingPreset = TIMER_PRESET_OPTIONS.find(opt => opt.value === totalSeconds);
-    return matchingPreset ? matchingPreset.value : 0;
-  }, [totalSeconds]);
-
-  const handlePresetSelect = useCallback((value: number) => {
-    if (value > 0) {
-      onSetTime(value);
-    }
-  }, [onSetTime]);
-
   return (
     <Panel title="TIMER">
       {/* Time Display */}
@@ -139,18 +117,6 @@ export const TimerPanel: React.FC<TimerPanelProps> = ({
           </View>
         </View>
       </View>
-
-      {/* Preset Selector */}
-      {!isRunning && !isPaused && (
-        <View style={styles.presetSelectorContainer}>
-          <DropdownSelector
-            label="時間を選択"
-            value={currentPresetValue}
-            options={presetDropdownOptions}
-            onChange={handlePresetSelect}
-          />
-        </View>
-      )}
 
       {/* Increment Buttons */}
       <View style={styles.incrementsContainer}>
@@ -240,12 +206,6 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.medium,
     marginTop: spacing[1],
-  },
-
-  // Preset Selector
-  presetSelectorContainer: {
-    alignItems: 'center',
-    marginBottom: spacing[4],
   },
 
   // Increment Buttons

@@ -26,6 +26,8 @@ interface UseTimerReturn {
   reset: () => void;
 }
 
+// Store callbacks in refs to avoid re-triggering useEffect
+
 // Maximum timer duration: 24 hours
 const MAX_SECONDS = 24 * 60 * 60;
 
@@ -45,6 +47,16 @@ export const useTimer = (options?: UseTimerOptions): UseTimerReturn => {
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+
+  // Store callbacks in refs to avoid re-triggering useEffect on every render
+  const onCompleteRef = useRef(options?.onComplete);
+  const onTickRef = useRef(options?.onTick);
+
+  // Update refs when options change
+  useEffect(() => {
+    onCompleteRef.current = options?.onComplete;
+    onTickRef.current = options?.onTick;
+  }, [options?.onComplete, options?.onTick]);
 
   // Play alarm sound when timer completes
   const playAlarm = useCallback((): void => {
@@ -180,7 +192,7 @@ export const useTimer = (options?: UseTimerOptions): UseTimerReturn => {
         // Timer completed
         if (newRemaining <= 0) {
           playAlarm();
-          options?.onComplete?.();
+          onCompleteRef.current?.();
           return {
             ...prev,
             remainingSeconds: 0,
@@ -189,7 +201,7 @@ export const useTimer = (options?: UseTimerOptions): UseTimerReturn => {
           };
         }
 
-        options?.onTick?.(newRemaining);
+        onTickRef.current?.(newRemaining);
 
         return {
           ...prev,
@@ -199,7 +211,7 @@ export const useTimer = (options?: UseTimerOptions): UseTimerReturn => {
     }, 1000);
 
     return () => clearTimer();
-  }, [state.isRunning, clearTimer, playAlarm, options]);
+  }, [state.isRunning, clearTimer, playAlarm]);
 
   // Cleanup on unmount
   useEffect(() => {
