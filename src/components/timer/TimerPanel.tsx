@@ -158,6 +158,13 @@ export const TimerPanel: React.FC<TimerPanelProps> = ({
         </TouchableOpacity>
       </View>
 
+      {/* Reset Button - shown when timer is running or paused */}
+      {(isRunning || isPaused) && (
+        <TouchableOpacity style={styles.resetButton} onPress={onReset}>
+          <Text style={styles.resetButtonText}>RESET</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Save Preset Button (Premium) */}
       {isPremium && totalSeconds > 0 && !isRunning && !isPaused && (
         <TouchableOpacity style={styles.saveButton} onPress={onSavePreset}>
@@ -277,6 +284,22 @@ const styles = StyleSheet.create({
   },
   mainButtonTextSecondary: {
     color: colors.surface.primary,
+  },
+
+  // Reset Button
+  resetButton: {
+    paddingHorizontal: spacing[8],
+    paddingVertical: spacing[2],
+    borderRadius: borderRadius.full,
+    borderWidth: 2,
+    borderColor: colors.border.secondary,
+    marginBottom: spacing[3],
+  },
+  resetButtonText: {
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.bold,
+    letterSpacing: 2,
   },
 
   // Save Button
