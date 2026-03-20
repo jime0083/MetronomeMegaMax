@@ -1,147 +1,100 @@
-/**
- * Ad Banner Component
- * Displays ads based on platform (iOS: AdMob, Web: AdSense)
- * Hides for premium users
- */
-
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
-import { useAuth } from '../../contexts/AuthContext';
-import { colors, borderRadius, spacing } from '../../constants/theme';
 
-type AdSize = 'banner' | 'sidebar' | 'leaderboard';
+type AdType = 'bottom' | 'side' | 'mobile';
 
 interface AdBannerProps {
-  size?: AdSize;
-  style?: object;
+  type: AdType;
 }
 
-// Ad unit dimensions
-const AD_SIZES: Record<AdSize, { width: number | string; height: number }> = {
-  banner: { width: '100%', height: 50 },
-  sidebar: { width: 160, height: 600 },
-  leaderboard: { width: '100%', height: 90 },
+const AD_CONFIG = {
+  bottom: {
+    width: 720,
+    height: 90,
+    slot: '2655010779',
+  },
+  side: {
+    width: 160,
+    height: 600,
+    slot: '1860803850',
+  },
+  mobile: {
+    width: 300,
+    height: 90,
+    slot: '4295395504',
+  },
 };
 
-/**
- * Web AdSense Component
- */
-const WebAdBanner: React.FC<{ size: AdSize; style?: object }> = ({
-  size,
-  style,
-}) => {
+export const AdBanner: React.FC<AdBannerProps> = ({ type }) => {
   const adRef = useRef<HTMLDivElement>(null);
-  const dimensions = AD_SIZES[size];
+  const isAdLoaded = useRef(false);
 
   useEffect(() => {
-    // AdSense script initialization
-    // Note: Actual AdSense code should be added after approval
-    if (adRef.current && typeof window !== 'undefined') {
-      // Placeholder for AdSense initialization
-      // window.adsbygoogle = window.adsbygoogle || [];
-      // window.adsbygoogle.push({});
+    if (Platform.OS !== 'web') return;
+    if (isAdLoaded.current) return;
+
+    const config = AD_CONFIG[type];
+
+    // Create ad element
+    if (adRef.current && !isAdLoaded.current) {
+      const ins = document.createElement('ins');
+      ins.className = 'adsbygoogle';
+      ins.style.display = 'inline-block';
+      ins.style.width = `${config.width}px`;
+      ins.style.height = `${config.height}px`;
+      ins.setAttribute('data-ad-client', 'ca-pub-2574956124078440');
+      ins.setAttribute('data-ad-slot', config.slot);
+
+      adRef.current.appendChild(ins);
+
+      // Push ad
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const adsbygoogle = (window as any).adsbygoogle || [];
+        adsbygoogle.push({});
+      } catch (e) {
+        // Ad blocked or error
+      }
+
+      isAdLoaded.current = true;
     }
-  }, []);
+  }, [type]);
 
-  return (
-    <View
-      style={[
-        styles.container,
-        {
-          width: dimensions.width,
-          height: dimensions.height,
-        },
-        style,
-      ]}
-    >
-      {/* AdSense placeholder - replace with actual ad code after approval */}
-      <View
-        ref={adRef as unknown as React.RefObject<View>}
-        style={styles.adPlaceholder}
-      >
-        {/* Ad will be rendered here */}
-      </View>
-    </View>
-  );
-};
-
-/**
- * iOS AdMob Component
- * Note: Requires react-native-google-mobile-ads and native setup
- */
-const IOSAdBanner: React.FC<{ size: AdSize; style?: object }> = ({
-  size,
-  style,
-}) => {
-  const dimensions = AD_SIZES[size];
-
-  // Placeholder for AdMob banner
-  // Actual implementation requires:
-  // 1. Install react-native-google-mobile-ads
-  // 2. Configure native iOS project
-  // 3. Add AdMob app ID to Info.plist
-
-  return (
-    <View
-      style={[
-        styles.container,
-        {
-          width: dimensions.width,
-          height: dimensions.height,
-        },
-        style,
-      ]}
-    >
-      <View style={styles.adPlaceholder}>
-        {/* AdMob banner will be rendered here */}
-      </View>
-    </View>
-  );
-};
-
-/**
- * Main Ad Banner Component
- * Automatically selects platform-specific implementation
- * Returns null for premium users
- */
-export const AdBanner: React.FC<AdBannerProps> = ({
-  size = 'banner',
-  style,
-}) => {
-  const { isPremium } = useAuth();
-
-  // Don't show ads for premium users
-  if (isPremium) {
+  if (Platform.OS !== 'web') {
+    // For native, return placeholder or nothing
     return null;
   }
 
-  if (Platform.OS === 'web') {
-    return <WebAdBanner size={size} style={style} />;
-  }
+  const config = AD_CONFIG[type];
 
-  if (Platform.OS === 'ios') {
-    return <IOSAdBanner size={size} style={style} />;
-  }
-
-  return null;
+  return (
+    <View
+      style={[
+        styles.container,
+        {
+          width: config.width,
+          height: config.height,
+        },
+      ]}
+    >
+      <div
+        ref={adRef}
+        style={{
+          width: config.width,
+          height: config.height,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.surface.border,
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.border.light,
+    alignItems: 'center',
+    justifyContent: 'center',
     overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  adPlaceholder: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: colors.background.tertiary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity: 0.5,
   },
 });

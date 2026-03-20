@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from './Header';
+import { AdBanner } from '@/components/ads/AdBanner';
 import { colors, spacing, typography, borderRadius } from '@/constants/theme';
 import { useResponsive } from '@/hooks/useResponsive';
 import type { PanelType } from '@/types';
@@ -86,7 +87,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
         <View style={styles.desktopContent}>
           {/* Left Ad Space */}
-          {showBothSidebars && <View style={styles.adSidebar} />}
+          {showBothSidebars && (
+            <View style={styles.adSidebar}>
+              <AdBanner type="side" />
+            </View>
+          )}
 
           {/* Main Panels */}
           <View style={styles.panelsContainer}>
@@ -96,11 +101,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           </View>
 
           {/* Right Ad Space */}
-          {showSidebar && <View style={styles.adSidebar} />}
+          {showSidebar && (
+            <View style={styles.adSidebar}>
+              <AdBanner type="side" />
+            </View>
+          )}
         </View>
 
         {/* Bottom Ad */}
-        <View style={styles.adBannerBottom} />
+        <View style={styles.adBannerBottom}>
+          <AdBanner type="bottom" />
+        </View>
       </SafeAreaView>
     );
   }
@@ -174,7 +185,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
       </ScrollView>
 
       {/* Bottom Ad */}
-      <View style={styles.adBannerBottomMobile} />
+      <View style={styles.adBannerBottomMobile}>
+        <AdBanner type="mobile" />
+      </View>
     </SafeAreaView>
   );
 };
@@ -202,21 +215,14 @@ const styles = StyleSheet.create({
   },
   adSidebar: {
     width: 160,
-    backgroundColor: colors.surface.border,
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-    opacity: 0.5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   adBannerBottom: {
     height: 90,
-    backgroundColor: colors.surface.border,
-    marginHorizontal: spacing[6],
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: spacing[4],
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-    opacity: 0.5,
   },
 
   // Mobile styles
@@ -278,13 +284,9 @@ const styles = StyleSheet.create({
     padding: spacing[4],
   },
   adBannerBottomMobile: {
-    height: 50,
-    backgroundColor: colors.surface.border,
-    marginHorizontal: spacing[4],
+    height: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: spacing[2],
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-    opacity: 0.5,
   },
 });
