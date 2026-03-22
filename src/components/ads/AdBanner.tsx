@@ -25,43 +25,93 @@ const AD_CONFIG = {
   },
 };
 
+const AD_CLIENT = 'ca-pub-2574956124078440';
+
+// Check if adsbygoogle script is loaded
+const isAdsbyGoogleLoaded = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return typeof (window as any).adsbygoogle !== 'undefined';
+};
+
+// Wait for adsbygoogle to be available
+const waitForAdsbyGoogle = (maxWait = 10000): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (isAdsbyGoogleLoaded()) {
+      resolve(true);
+      return;
+    }
+
+    const startTime = Date.now();
+    const checkInterval = setInterval(() => {
+      if (isAdsbyGoogleLoaded()) {
+        clearInterval(checkInterval);
+        resolve(true);
+      } else if (Date.now() - startTime > maxWait) {
+        clearInterval(checkInterval);
+        resolve(false);
+      }
+    }, 100);
+  });
+};
+
 export const AdBanner: React.FC<AdBannerProps> = ({ type }) => {
-  const adRef = useRef<HTMLDivElement>(null);
-  const isAdLoaded = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const adInitialized = useRef(false);
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
-    if (isAdLoaded.current) return;
+    if (adInitialized.current) return;
 
     const config = AD_CONFIG[type];
 
-    // Create ad element
-    if (adRef.current && !isAdLoaded.current) {
+    const initializeAd = async () => {
+      // Wait for adsbygoogle script to load
+      const loaded = await waitForAdsbyGoogle();
+      if (!loaded) {
+        return;
+      }
+
+      if (!containerRef.current || adInitialized.current) return;
+
+      // Clear any existing content
+      containerRef.current.innerHTML = '';
+
+      // Create the ad element
       const ins = document.createElement('ins');
       ins.className = 'adsbygoogle';
       ins.style.display = 'inline-block';
       ins.style.width = `${config.width}px`;
       ins.style.height = `${config.height}px`;
-      ins.setAttribute('data-ad-client', 'ca-pub-2574956124078440');
+      ins.setAttribute('data-ad-client', AD_CLIENT);
       ins.setAttribute('data-ad-slot', config.slot);
 
-      adRef.current.appendChild(ins);
+      containerRef.current.appendChild(ins);
 
-      // Push ad
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const adsbygoogle = (window as any).adsbygoogle || [];
-        adsbygoogle.push({});
-      } catch (e) {
-        // Ad blocked or error
-      }
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const adsbygoogle = (window as any).adsbygoogle;
+          if (adsbygoogle && typeof adsbygoogle.push === 'function') {
+            adsbygoogle.push({});
+            adInitialized.current = true;
+          }
+        } catch (e) {
+          // Ad blocked or error - silently fail
+        }
+      });
+    };
 
-      isAdLoaded.current = true;
-    }
+    // Small delay to ensure component is fully mounted
+    const timer = setTimeout(initializeAd, 100);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [type]);
 
   if (Platform.OS !== 'web') {
-    // For native, return placeholder or nothing
     return null;
   }
 
@@ -78,13 +128,15 @@ export const AdBanner: React.FC<AdBannerProps> = ({ type }) => {
       ]}
     >
       <div
-        ref={adRef}
+        ref={containerRef}
         style={{
           width: config.width,
           height: config.height,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          minWidth: config.width,
+          minHeight: config.height,
         }}
       />
     </View>
