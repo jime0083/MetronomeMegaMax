@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from './Header';
 import { AdBanner } from '@/components/ads/AdBanner';
+import { AppUsageGuide } from '@/components/common/AppUsageGuide';
 import { colors, spacing, typography, borderRadius } from '@/constants/theme';
 import { useResponsive } from '@/hooks/useResponsive';
 import type { PanelType } from '@/types';
@@ -85,33 +86,38 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           language={language}
         />
 
-        <View style={styles.desktopContent}>
-          {/* Left Ad Space */}
-          {showBothSidebars && (
-            <View style={styles.adSidebar}>
-              <AdBanner type="side" />
-            </View>
-          )}
+        <ScrollView style={styles.desktopScrollView} contentContainerStyle={styles.desktopScrollContent}>
+          <View style={styles.desktopContent}>
+            {/* Left Ad Space */}
+            {showBothSidebars && (
+              <View style={styles.adSidebar}>
+                <AdBanner type="side" />
+              </View>
+            )}
 
-          {/* Main Panels */}
-          <View style={styles.panelsContainer}>
-            <View style={styles.panel}>{metronomePanel}</View>
-            <View style={styles.panel}>{timerPanel}</View>
-            <View style={styles.panel}>{audioPanel}</View>
+            {/* Main Panels */}
+            <View style={styles.panelsContainer}>
+              <View style={styles.panel}>{metronomePanel}</View>
+              <View style={styles.panel}>{timerPanel}</View>
+              <View style={styles.panel}>{audioPanel}</View>
+            </View>
+
+            {/* Right Ad Space */}
+            {showSidebar && (
+              <View style={styles.adSidebar}>
+                <AdBanner type="side" />
+              </View>
+            )}
           </View>
 
-          {/* Right Ad Space */}
-          {showSidebar && (
-            <View style={styles.adSidebar}>
-              <AdBanner type="side" />
-            </View>
-          )}
-        </View>
+          {/* Usage Guide - Below Panels */}
+          <AppUsageGuide />
 
-        {/* Bottom Ad */}
-        <View style={styles.adBannerBottom}>
-          <AdBanner type="bottom" />
-        </View>
+          {/* Bottom Ad */}
+          <View style={styles.adBannerBottom}>
+            <AdBanner type="bottom" />
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -129,65 +135,71 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         language={language}
       />
 
-      {/* Panel Navigation */}
-      <View style={styles.panelNavigation}>
-        {/* Left Arrow */}
-        <TouchableOpacity
-          style={[styles.navArrow, !canGoBack && styles.navArrowDisabled]}
-          onPress={goToPreviousPanel}
-          disabled={!canGoBack}
-          accessibilityLabel="Previous panel"
-        >
-          <Text style={[styles.navArrowText, !canGoBack && styles.navArrowTextDisabled]}>
-            {'<'}
-          </Text>
-        </TouchableOpacity>
+      <ScrollView style={styles.mobileMainScrollView}>
+        {/* Panel Navigation */}
+        <View style={styles.panelNavigation}>
+          {/* Left Arrow */}
+          <TouchableOpacity
+            style={[styles.navArrow, !canGoBack && styles.navArrowDisabled]}
+            onPress={goToPreviousPanel}
+            disabled={!canGoBack}
+            accessibilityLabel="Previous panel"
+          >
+            <Text style={[styles.navArrowText, !canGoBack && styles.navArrowTextDisabled]}>
+              {'<'}
+            </Text>
+          </TouchableOpacity>
 
-        {/* Panel Indicators */}
-        <View style={styles.indicators}>
-          {PANEL_INDICATORS.map((panel) => (
-            <TouchableOpacity
-              key={panel}
-              style={[styles.indicator, activePanel === panel && styles.indicatorActive]}
-              onPress={() => scrollToPanel(panel)}
-              accessibilityLabel={`Go to ${panel} panel`}
-            />
-          ))}
+          {/* Panel Indicators */}
+          <View style={styles.indicators}>
+            {PANEL_INDICATORS.map((panel) => (
+              <TouchableOpacity
+                key={panel}
+                style={[styles.indicator, activePanel === panel && styles.indicatorActive]}
+                onPress={() => scrollToPanel(panel)}
+                accessibilityLabel={`Go to ${panel} panel`}
+              />
+            ))}
+          </View>
+
+          {/* Right Arrow */}
+          <TouchableOpacity
+            style={[styles.navArrow, !canGoForward && styles.navArrowDisabled]}
+            onPress={goToNextPanel}
+            disabled={!canGoForward}
+            accessibilityLabel="Next panel"
+          >
+            <Text style={[styles.navArrowText, !canGoForward && styles.navArrowTextDisabled]}>
+              {'>'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Right Arrow */}
-        <TouchableOpacity
-          style={[styles.navArrow, !canGoForward && styles.navArrowDisabled]}
-          onPress={goToNextPanel}
-          disabled={!canGoForward}
-          accessibilityLabel="Next panel"
+        {/* Swipeable Panels */}
+        <ScrollView
+          ref={scrollViewRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          style={styles.mobileScrollView}
+          contentContainerStyle={styles.mobileScrollContent}
+          nestedScrollEnabled
         >
-          <Text style={[styles.navArrowText, !canGoForward && styles.navArrowTextDisabled]}>
-            {'>'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <View style={[styles.mobilePanel, { width }]}>{metronomePanel}</View>
+          <View style={[styles.mobilePanel, { width }]}>{timerPanel}</View>
+          <View style={[styles.mobilePanel, { width }]}>{audioPanel}</View>
+        </ScrollView>
 
-      {/* Swipeable Panels */}
-      <ScrollView
-        ref={scrollViewRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        style={styles.mobileScrollView}
-        contentContainerStyle={styles.mobileScrollContent}
-      >
-        <View style={[styles.mobilePanel, { width }]}>{metronomePanel}</View>
-        <View style={[styles.mobilePanel, { width }]}>{timerPanel}</View>
-        <View style={[styles.mobilePanel, { width }]}>{audioPanel}</View>
+        {/* Usage Guide - Below Panels */}
+        <AppUsageGuide />
+
+        {/* Bottom Ad */}
+        <View style={styles.adBannerBottomMobile}>
+          <AdBanner type="mobile" />
+        </View>
       </ScrollView>
-
-      {/* Bottom Ad */}
-      <View style={styles.adBannerBottomMobile}>
-        <AdBanner type="mobile" />
-      </View>
     </SafeAreaView>
   );
 };
@@ -199,8 +211,13 @@ const styles = StyleSheet.create({
   },
 
   // Desktop styles
-  desktopContent: {
+  desktopScrollView: {
     flex: 1,
+  },
+  desktopScrollContent: {
+    flexGrow: 1,
+  },
+  desktopContent: {
     flexDirection: 'row',
     padding: spacing[6],
     gap: spacing[4],
@@ -274,8 +291,12 @@ const styles = StyleSheet.create({
     borderColor: colors.accent[600],
     width: 24,
   },
-  mobileScrollView: {
+  mobileMainScrollView: {
     flex: 1,
+  },
+  mobileScrollView: {
+    flexGrow: 0,
+    flexShrink: 0,
   },
   mobileScrollContent: {
     flexGrow: 1,
